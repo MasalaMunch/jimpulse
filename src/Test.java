@@ -1,3 +1,5 @@
+import java.util.stream.Stream;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -20,7 +22,7 @@ public class Test extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
-
+	
 	@Override
 	public void start(Stage stage) throws Exception {
 		
@@ -48,9 +50,9 @@ public class Test extends Application {
 				simulation.advance(TIMESTEP);
 				
 				gc.setFill(DISC_COLOR);
-				for(DiscBody db : simulation) { //TODO use a stream
+				for (DiscBody db : simulation)				
 					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
-				}
+				
 			}
 		}.start();
 		

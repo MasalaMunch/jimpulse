@@ -8,6 +8,7 @@ public class DiscBody {
 	protected double velX,  velY;
 	protected double forceX, forceY;
 	protected double accelX, accelY;
+	protected double minY, maxY;
 	
 	// GETTERS
 	
@@ -19,7 +20,7 @@ public class DiscBody {
 		return massInverse;
 	}
 	
-	public boolean hasInfiniteMass() {
+	public boolean getHasInfiniteMass() {
 		return hasInfiniteMass;
 	}
 	
@@ -57,6 +58,14 @@ public class DiscBody {
 
 	public double getAccelY() {
 		return accelY;
+	}
+	
+	public double getMinY() {
+		return minY;
+	}
+
+	public double getMaxY() {
+		return maxY;
 	}
 
 	// CONSTRUCTOR AND SETTERS
@@ -124,22 +133,21 @@ public class DiscBody {
 
 	// OTHER METHODS
 	
-	public void advancePos(double timestep) {
+	public void advance(double timestep) {
 		posX += velX*timestep;
 		posY += velY*timestep;
-	}
-	
-	public void advanceVel(double timestep) {
 		velX += accelX*timestep;
 		velY += accelY*timestep;
 	}
 		
-	//TODO: wrong (trademark)
-	public double getMinPosY(double timestep) {
-		
-		return (posY - radius + velY*timestep);
-	}
-	public double getMaxPosY(double timestep) {
-		return (posY + radius + velY*timestep);
+	public void updateBounds(double timestep) {
+		if (velY > 0) {
+			maxY = posY + radius + timestep*velY;
+			minY = posY - radius;
+		}
+		else {
+			maxY = posY + radius;
+			minY = posY - radius + timestep*velY;
+		}
 	}
 }
