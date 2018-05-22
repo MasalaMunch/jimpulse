@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -10,6 +11,7 @@ public class DiscBodySet implements Iterable<DiscBody> {
 	private double[] bounds;
 	private int[] boundBodies;
 	private boolean[] boundTypes; // false is min, true is max
+	private HashMap<PointPair, Boolean> pointPairs;
 	
 	public DiscBodySet(DiscBody... bodies) {
 		

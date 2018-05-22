@@ -5,12 +5,10 @@ public class DiscBody {
 	protected boolean hasInfiniteMass;
 	protected double radius;
 	protected double posX, posY;
-	protected double velX,  velY;
+	protected double velX, velY;
 	protected double forceX, forceY;
 	protected double accelX, accelY;
 	protected double minY, maxY;
-	
-	// GETTERS
 	
 	public double getMass() {
 		return mass;
@@ -67,8 +65,6 @@ public class DiscBody {
 	public double getMaxY() {
 		return maxY;
 	}
-
-	// CONSTRUCTOR AND SETTERS
 
 	public DiscBody(double posX, double posY) {
 		setMass(1);
@@ -131,8 +127,6 @@ public class DiscBody {
 		this.accelY = accelY;
 	}
 
-	// OTHER METHODS
-	
 	public void advance(double timestep) {
 		posX += velX*timestep;
 		posY += velY*timestep;
