@@ -34,11 +34,16 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		DiscBody d1 = new DiscBody(0, 0);
-		d1.setVelX(100); d1.setVelY(100);
-		DiscBody d2 = new DiscBody(RES_X, RES_Y);
-		d2.setVelX(-100); d2.setVelY(-100);
-		Simulation sim = new Simulation(d1, d2);
+		int howManyDiscs = 500;
+		double velRange = 10;
+		DiscBody[] aLot = new DiscBody[howManyDiscs];
+		for (int i=0; i<aLot.length; i++) {
+			aLot[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
+			aLot[i].setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
+			aLot[i].setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
+		}
+		
+		Simulation sim = new Simulation(aLot);
 		
 		new AnimationTimer() {
 			@Override

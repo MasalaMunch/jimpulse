@@ -135,13 +135,21 @@ public class DiscBody {
 	}
 		
 	public void updateBounds(double timestep) {
-		if (velY > 0) {
-			maxY = posY + radius + timestep*velY;
-			minY = posY - radius;
+//		if (velY > 0) {
+//			maxY = posY + radius + timestep*velY;
+//			minY = posY - radius;
+//		}
+//		else {
+//			maxY = posY + radius;
+//			minY = posY - radius + timestep*velY;
+//		}
+		if (velY > 0) { //TODO switch this back to actually being Y
+			maxY = posX + radius + timestep*velX;
+			minY = posX - radius;
 		}
 		else {
-			maxY = posY + radius;
-			minY = posY - radius + timestep*velY;
+			maxY = posX + radius;
+			minY = posX - radius + timestep*velX;
 		}
 	}
 }

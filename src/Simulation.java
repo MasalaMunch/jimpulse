@@ -1,26 +1,21 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class Simulation implements Iterable<DiscBody> {
 	
 	private ArrayList<DiscBody> bodies;
 	boolean[] pairFlags;
-//	int[] pairSubseqIndices;
 	private double[] bounds;
 	private int[] boundBodies;
 	private boolean[] boundTypes; // false is min, true is max
-	private IntStream boundIndicesParallelStream;
 	
 	public Simulation(DiscBody... bodies) {
 		
 		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
 		
-		pairFlags = new boolean[bodies.length*(bodies.length-1)/2];
+		pairFlags = new boolean[triangularNumber(bodies.length)];
 		
 		int length = 2*bodies.length;
 		bounds = new double[length];
@@ -60,53 +55,33 @@ public class Simulation implements Iterable<DiscBody> {
 				bounds[i] = bodies.get(boundBodies[i]).getMinY();
 			});
 		
-		int i, rightI, leftI, pairI;
-		double right, left;
-		boolean swapEqualBounds = false;
-		//TODO remove swapEqualBounds if bit flipping works
-		for (i=1; i<bounds.length; i++) {
+		int rightI, leftI, pairI;
+		double right;
+		for (int i=1; i<bounds.length; i++) {
 			rightI = i;
 			right = bounds[rightI];
 			for (leftI = rightI-1; leftI >= 0; leftI--) {
-				left = bounds[leftI];
-				if (left < right)
+				if (bounds[leftI] <= right)
 					break;
-				if (left > right || (swapEqualBounds = boundTypes[leftI] && !boundTypes[rightI])) {
-					doubleSwap(bounds, leftI, rightI);
-					intSwap(boundBodies, leftI, rightI);
-					booleanSwap(boundTypes, leftI, rightI);
-					if (swapEqualBounds) {
-						swapEqualBounds = false;
-						break;						
-					}
-					else {
-						pairI = pairIndex(boundBodies[leftI],boundBodies[rightI],bodies.size());
-						pairFlags[pairI] = !pairFlags[pairI];
-						rightI--;
-					}
+				doubleSwap(bounds, leftI, rightI);
+				intSwap(boundBodies, leftI, rightI);
+				booleanSwap(boundTypes, leftI, rightI);
+				if (boundTypes[leftI] ^ boundTypes[rightI]) {
+					pairI = pairIndex(boundBodies[leftI], boundBodies[rightI], bodies.size());
+					pairFlags[pairI] ^= true;
 				}
-			}
-		}
-
-		//TODO speed up, do this while sorting?
-		ArrayList<Integer[]> crossingPairs = new ArrayList<Integer[]>();
-		HashSet<Integer> activeBodies = new HashSet<Integer>();
-		int bodyIndex;
-		for(i=0; i<bounds.length-1; i++) {
-			if (boundTypes[i]) {
-				activeBodies.remove(boundBodies[i]);
-			}
-			else {
-				bodyIndex = boundBodies[i];
-				for (Integer ab : activeBodies)
-					crossingPairs.add(new Integer[] {ab, bodyIndex});
-				activeBodies.add(bodyIndex);
+				rightI--;
 			}
 		}
 		
-		if (crossingPairs.size() > 0)
-			for (Integer[] pair : crossingPairs)
-				Test.println(Arrays.toString(pair));
+		/*TODO decide:
+		 * filter the other axis in parallel to this one?
+		 * filter the output of this axis check normally?
+		 * filter the output of this axis check using a smaller-sweep-and-prune algorithm?
+		 */
+		
+		long howManyOverlaps = IntStream.range(0, pairFlags.length).parallel().filter(x->pairFlags[x]).count();
+		Test.println(howManyOverlaps);
 		
 		//TODO form islands
 		
@@ -115,6 +90,8 @@ public class Simulation implements Iterable<DiscBody> {
 		bodies.parallelStream().forEach(b->b.advance(timestep));
 		
 	}
+	
+	//TODO write reverse function for gong from pairIndex to bodyIndices
 
 	private static int pairSubseqIndex(int minBody, int bodyCount) {
 		int s = triangularNumber(minBody+1)-1;
