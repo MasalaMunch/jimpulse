@@ -36,28 +36,38 @@ public class Test extends Application {
 		
 		DiscBody d1 = new DiscBody(0, 0);
 		d1.setVelX(100); d1.setVelY(100);
-		DiscBody d2 = new DiscBody(RES_X, 0);
-		d2.setVelX(-100); d2.setVelY(100);
-		DiscBodySet simulation = new DiscBodySet(d1, d2);
+		DiscBody d2 = new DiscBody(RES_X, RES_Y);
+		d2.setVelX(-100); d2.setVelY(-100);
+		Simulation sim = new Simulation(d1, d2);
 		
 		new AnimationTimer() {
 			@Override
 			public void handle(long currentNanoTime) {
-				
 				gc.setFill(BG_COLOR);
 				gc.fillRect(0, 0, RES_X, RES_Y);
-				
-				simulation.advance(TIMESTEP);
-				
+				sim.advance(TIMESTEP);
 				gc.setFill(DISC_COLOR);
-				for (DiscBody db : simulation)				
-					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
-				
+				for (DiscBody db : sim)				
+					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());	
 			}
 		}.start();
 		
 		stage.show();
 
+	}
+	
+	public static void println(Object... args) {
+		print(args);
+		System.out.println();
+	}
+	
+	public static void print(Object... args) {
+		int i = 0;
+		for (Object o : args) {
+			System.out.print(o);
+			if (++i < args.length)
+				System.out.print(" ");
+		}
 	}
 		
 }
