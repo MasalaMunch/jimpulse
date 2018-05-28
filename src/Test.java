@@ -1,5 +1,4 @@
 import java.util.stream.Stream;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -8,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 
 public class Test extends Application {
@@ -34,18 +34,29 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		int howManyDiscs = 500;
-		double velRange = 10;
-		DiscBody[] aLot = new DiscBody[howManyDiscs];
-		for (int i=0; i<aLot.length; i++) {
-			aLot[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
-			aLot[i].setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
-			aLot[i].setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
+		int howManyBodies = 5000;
+		double velRange = 50;
+		double radius = 10;
+		DiscBody[] bodies = new DiscBody[howManyBodies];
+		for (int i=0; i<bodies.length; i++) {
+			bodies[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
+			bodies[i].setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
+			bodies[i].setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
+			bodies[i].setRadius(radius);
 		}
+		Simulation sim = new Simulation(bodies);
 		
-		Simulation sim = new Simulation(aLot);
+//		DiscBody b0 = new DiscBody(0, 0);
+//		b0.setVelX(100); b0.setVelX(100);
+//		DiscBody b1 = new DiscBody(0, RES_Y);
+//		b1.setVelX(100); b1.setVelY(-100);
+//		DiscBody b2 = new DiscBody(RES_X, RES_Y);
+//		b2.setVelX(-100); b2.setVelY(-100);
+//		Simulation sim = new Simulation(b0, b1, b2);
 		
 		new AnimationTimer() {
+			public double frames = 0;
+			public long startTime = System.nanoTime();
 			@Override
 			public void handle(long currentNanoTime) {
 				gc.setFill(BG_COLOR);
@@ -53,7 +64,10 @@ public class Test extends Application {
 				sim.advance(TIMESTEP);
 				gc.setFill(DISC_COLOR);
 				for (DiscBody db : sim)				
-					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());	
+					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
+				frames++;
+				double elapsedTime = NANOSECONDS.toSeconds(currentNanoTime-startTime);
+				println(frames/elapsedTime); //TODO render onto the canvas instead of printing to console
 			}
 		}.start();
 		

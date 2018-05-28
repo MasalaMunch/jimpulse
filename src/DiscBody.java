@@ -1,14 +1,15 @@
 
 public class DiscBody {
 	
-	protected double mass, massInverse;
-	protected boolean hasInfiniteMass;
-	protected double radius;
-	protected double posX, posY;
-	protected double velX, velY;
-	protected double forceX, forceY;
-	protected double accelX, accelY;
-	protected double minY, maxY;
+	private double mass, massInverse;
+	private boolean hasInfiniteMass;
+	private double radius;
+	private double posX, posY;
+	private double velX, velY;
+	private double forceX, forceY;
+	private double accelX, accelY;
+	private double minX, minY;
+	private double maxX, maxY;
 	
 	public double getMass() {
 		return mass;
@@ -58,8 +59,16 @@ public class DiscBody {
 		return accelY;
 	}
 	
+	public double getMinX() {
+		return minX;
+	}
+	
 	public double getMinY() {
 		return minY;
+	}
+
+	public double getMaxX() {
+		return maxX;
 	}
 
 	public double getMaxY() {
@@ -132,24 +141,26 @@ public class DiscBody {
 		posY += velY*timestep;
 		velX += accelX*timestep;
 		velY += accelY*timestep;
+		updateBounds(timestep);
 	}
-		
+			
 	public void updateBounds(double timestep) {
-//		if (velY > 0) {
-//			maxY = posY + radius + timestep*velY;
-//			minY = posY - radius;
-//		}
-//		else {
-//			maxY = posY + radius;
-//			minY = posY - radius + timestep*velY;
-//		}
-		if (velY > 0) { //TODO switch this back to actually being Y
-			maxY = posX + radius + timestep*velX;
-			minY = posX - radius;
+		if (velX > 0) {
+			maxX = posX + radius + timestep*velX;
+			minX = posX - radius;
 		}
 		else {
-			maxY = posX + radius;
-			minY = posX - radius + timestep*velX;
+			maxX = posX + radius;
+			minX = posX - radius + timestep*velX;
+		}
+		if (velY > 0) {
+			maxY = posY + radius + timestep*velY;
+			minY = posY - radius;
+		}
+		else {
+			maxY = posY + radius;
+			minY = posY - radius + timestep*velY;
 		}
 	}
+	
 }

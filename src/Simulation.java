@@ -2,20 +2,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.IntStream;
+import org.eclipse.collections.api.iterator.MutableIntIterator;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 public class Simulation implements Iterable<DiscBody> {
 	
 	private ArrayList<DiscBody> bodies;
-	boolean[] pairFlags;
-	private double[] bounds;
-	private int[] boundBodies;
-	private boolean[] boundTypes; // false is min, true is max
+	private IntHashSet overlapsX, overlapsY;
+	//TODO use primitive ArrayLists from eclipse.collections instead of Arrays?
+	private double[] boundsX;
+	private int[] boundBodiesX;
+	private boolean[] boundTypesX; // false is min, true is max
 	
 	public Simulation(DiscBody... bodies) {
 		
 		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
-		
-		pairFlags = new boolean[triangularNumber(bodies.length)];
 		
 		int length = 2*bodies.length;
 		bounds = new double[length];
@@ -42,47 +43,88 @@ public class Simulation implements Iterable<DiscBody> {
 //		return bodies.parallelStream();
 //	}
 	
-	public void advance(double timestep) {
+	private void initializeOverlaps(double timestep) {
 		
-		// TODO solve constraints
+		Integer[] boundIndices = IntStream.range(0, bounds.length).parallel().boxed().toArray(Integer[]::new);
+		Arrays.parallelSort(boundIndices, (i,j) -> new Double(bounds[i]).compareTo(bounds[j]));
 		
-		bodies.parallelStream().forEach(b->b.updateBounds(timestep));
+		double[] newBounds = new double[bounds.length];
+		int[] newBoundBodies = new int[boundBodies.length];
+		boolean[] newBoundTypes = new boolean[boundTypes.length];
 		
-		IntStream.range(0, bounds.length).parallel().forEach(i -> {
+		IntStream.range(0, boundIndices.length).parallel().forEach(i -> {
+			final int j = boundIndices[i];
+			newBounds[i] = bounds[j];
+			newBoundBodies[i] = boundBodies[j];
+			newBoundTypes[i] = boundTypes[j];
+		});
+		
+		bounds = newBounds;
+		boundBodies = newBoundBodies;
+		boundTypes = newBoundTypes;
+		
+		activePairs = new IntHashSet();
+		final int bodyCount = bounds.length/2;
+		IntHashSet activeBodies = new IntHashSet();
+		int body1;
+		MutableIntIterator iter;
+		for (int i=0; i<bounds.length-1; i++) {
 			if (boundTypes[i])
-				bounds[i] = bodies.get(boundBodies[i]).getMaxY();
-			else
-				bounds[i] = bodies.get(boundBodies[i]).getMinY();
-			});
-		
-		int rightI, leftI, pairI;
-		double right;
-		for (int i=1; i<bounds.length; i++) {
-			rightI = i;
-			right = bounds[rightI];
-			for (leftI = rightI-1; leftI >= 0; leftI--) {
-				if (bounds[leftI] <= right)
-					break;
-				doubleSwap(bounds, leftI, rightI);
-				intSwap(boundBodies, leftI, rightI);
-				booleanSwap(boundTypes, leftI, rightI);
-				if (boundTypes[leftI] ^ boundTypes[rightI]) {
-					pairI = pairIndex(boundBodies[leftI], boundBodies[rightI], bodies.size());
-					pairFlags[pairI] ^= true;
-				}
-				rightI--;
+				activeBodies.remove(boundBodies[i]);
+			else {
+				body1 = boundBodies[i];
+				iter = activeBodies.intIterator();
+				while (iter.hasNext())
+					activePairs.add(pairIndex(body1, iter.next(), bodyCount));
+				activeBodies.add(body1);
 			}
 		}
+	}
+	
+	public void advance(double timestep) {
 		
-		/*TODO decide:
-		 * filter the other axis in parallel to this one?
-		 * filter the output of this axis check normally?
-		 * filter the output of this axis check using a smaller-sweep-and-prune algorithm?
-		 */
+		if (overlapsX == null)
+			bodies.parallelStream().forEach(b->b.updateBounds(timestep));
 		
-		long howManyOverlaps = IntStream.range(0, pairFlags.length).parallel().filter(x->pairFlags[x]).count();
-		Test.println(howManyOverlaps);
+		IntStream.range(0, boundsX.length).parallel().forEach(i -> {
+			if (boundTypesX[i])
+				boundsX[i] = bodies.get(boundBodiesX[i]).getMaxX();
+			else
+				boundsX[i] = bodies.get(boundBodiesX[i]).getMinX();
+			});
+		 
+		//TODO filter X in parallel with Y
 		
+		if (overlapsX == null)
+			initializeOverlaps(timestep);
+		else {
+			
+			final int bodyCount = bounds.length/2;
+			int rightI, leftI, pairIndex;
+			double right;
+			for (int i=1; i<bounds.length; i++) {
+				rightI = i;
+				right = bounds[rightI];
+				for (leftI = rightI-1; leftI >= 0; leftI--) {
+					if (bounds[leftI] <= right)
+						break;
+					if (boundTypes[leftI] ^ boundTypes[rightI]) {
+						pairIndex = pairIndex(boundBodies[leftI], boundBodies[rightI], bodyCount);
+						if (!activePairs.add(pairIndex))
+							activePairs.remove(pairIndex);
+					}
+					doubleSwap(bounds, leftI, rightI);
+					intSwap(boundBodies, leftI, rightI);
+					booleanSwap(boundTypes, leftI, rightI);
+					rightI--;
+				}
+			}
+		
+		}
+	
+		
+//		Test.println(activePairs.size());
+						
 		//TODO form islands
 		
 		//TODO solve islands
@@ -92,18 +134,14 @@ public class Simulation implements Iterable<DiscBody> {
 	}
 	
 	//TODO write reverse function for gong from pairIndex to bodyIndices
-
-	private static int pairSubseqIndex(int minBody, int bodyCount) {
-		int s = triangularNumber(minBody+1)-1;
-		int i = 2+minBody;
-		return s + (bodyCount-i)*minBody;
-	}
 	
+	//TODO figure out when this produces negative values as a result of int overflow
 	private static int pairIndex(int body1, int body2, int bodyCount) {	
-		int minBody = Math.min(body1, body2);
-		int subseqIndex = pairSubseqIndex(minBody, bodyCount);
-		int maxBody = minBody==body1? body2 : body1;
-		return subseqIndex + (maxBody-minBody-1);
+		final int minBody = Math.min(body1, body2);
+		return triangularNumber(minBody+1)
+			   + (bodyCount-2-minBody)*minBody
+			   + (minBody==body1? body2 : body1)
+			   - minBody - 2;
 	}
 	
 	private static int triangularNumber(int n) {
@@ -111,21 +149,21 @@ public class Simulation implements Iterable<DiscBody> {
 	}
 
 	private static void doubleSwap(double[] a, int i, int j) {
-		double t = a[i];
+		final double tmp = a[i];
 		a[i] = a[j];
-		a[j] = t;
+		a[j] = tmp;
 	}
 	
 	private static void intSwap(int[] a, int i, int j) {
-		int t = a[i];
+		final int tmp = a[i];
 		a[i] = a[j];
-		a[j] = t;
+		a[j] = tmp;
 	}
 	
 	private static void booleanSwap(boolean[] a, int i, int j) {
-		boolean t = a[i];
+		final boolean tmp = a[i];
 		a[i] = a[j];
-		a[j] = t;
+		a[j] = tmp;
 	}
 	
 }
