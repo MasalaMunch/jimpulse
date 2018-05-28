@@ -105,12 +105,14 @@ public class Simulation implements Iterable<DiscBody> {
 				boundTypes = boundTypesY;
 			}
 			
+			int iterCount = 0;
 			int rightI, leftI;
 			double right;
 			for (int i=1; i<bounds.size(); i++) {
 				rightI = i;
 				right = bounds.get(rightI);
 				for (leftI = rightI-1; leftI >= 0; leftI--) {
+					iterCount++;
 					if (bounds.get(leftI) <= right)
 						break;
 					if (boundTypes.get(leftI) ^ boundTypes.get(rightI)) {
@@ -125,15 +127,15 @@ public class Simulation implements Iterable<DiscBody> {
 					rightI--;
 				}
 			}
-		
+			Test.println(axis, iterCount);
 		});
 		
-//		int overlapCount = 0;
-//		for(Object o : overlapsX) {
-//			if (overlapsY.contains(o))
-//				overlapCount++;
-//		}
-//		Test.println(overlapCount);
+		/*
+		 * TODO only do one sweep on a customizable axis
+		 */
+		Test.println();
+		Test.println(overlapsX.size(), overlapsY.size());
+		Test.println();
 
 		bodies.parallelStream().forEach(b->b.advance(timestep));
 			
