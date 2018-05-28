@@ -34,9 +34,9 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		int howManyBodies = 5000;
+		int howManyBodies = 500;
 		double velRange = 50;
-		double radius = 10;
+		double radius = 20;
 		DiscBody[] bodies = new DiscBody[howManyBodies];
 		for (int i=0; i<bodies.length; i++) {
 			bodies[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
@@ -65,9 +65,9 @@ public class Test extends Application {
 				gc.setFill(DISC_COLOR);
 				for (DiscBody db : sim)				
 					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
-				frames++;
-				double elapsedTime = NANOSECONDS.toSeconds(currentNanoTime-startTime);
-				println(frames/elapsedTime); //TODO render onto the canvas instead of printing to console
+//				frames++;
+//				double elapsedTime = NANOSECONDS.toSeconds(currentNanoTime-startTime);
+//				println(frames/elapsedTime); //TODO render onto the canvas instead of printing to console
 			}
 		}.start();
 		

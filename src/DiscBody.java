@@ -2,7 +2,6 @@
 public class DiscBody {
 	
 	private double mass, massInverse;
-	private boolean hasInfiniteMass;
 	private double radius;
 	private double posX, posY;
 	private double velX, velY;
@@ -18,11 +17,7 @@ public class DiscBody {
 	public double getMassInverse() {
 		return massInverse;
 	}
-	
-	public boolean getHasInfiniteMass() {
-		return hasInfiniteMass;
-	}
-	
+		
 	public double getRadius() {
 		return radius;
 	}
@@ -84,16 +79,11 @@ public class DiscBody {
 		setVelY(0);
 		setForceX(0);
 		setForceY(0);
-		if (hasInfiniteMass) {
-			setAccelX(0);
-			setAccelY(0);			
-		}
 	}
 	
 	public void setMass(double mass) {
 		this.mass = mass;
 		massInverse = 1/mass;
-		hasInfiniteMass = (mass == Double.POSITIVE_INFINITY);
 	}
 	
 	public void setRadius(double radius) {
@@ -118,14 +108,12 @@ public class DiscBody {
 
 	public void setForceX(double forceX) {
 		this.forceX = forceX;
-		if (!hasInfiniteMass)
-			setAccelX(forceX*massInverse);
+		setAccelX(forceX*massInverse);
 	}
 
 	public void setForceY(double forceY) {
 		this.forceY = forceY;
-		if (!hasInfiniteMass)
-			setAccelY(forceY*massInverse);
+		setAccelY(forceY*massInverse);
 	}
 
 	public void setAccelX(double accelX) {
@@ -141,9 +129,8 @@ public class DiscBody {
 		posY += velY*timestep;
 		velX += accelX*timestep;
 		velY += accelY*timestep;
-		updateBounds(timestep);
 	}
-			
+
 	public void updateBounds(double timestep) {
 		if (velX > 0) {
 			maxX = posX + radius + timestep*velX;
@@ -162,5 +149,5 @@ public class DiscBody {
 			minY = posY - radius + timestep*velY;
 		}
 	}
-	
+
 }
