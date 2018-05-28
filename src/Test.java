@@ -46,6 +46,8 @@ public class Test extends Application {
 		}
 		Simulation sim = new Simulation(bodies);
 		
+		System.gc();
+		
 //		DiscBody b0 = new DiscBody(0, 0);
 //		b0.setVelX(100); b0.setVelX(100);
 //		DiscBody b1 = new DiscBody(0, RES_Y);

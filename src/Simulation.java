@@ -12,43 +12,50 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 public class Simulation implements Iterable<DiscBody> {
 	
 	private ArrayList<DiscBody> bodies;
-	private HashSet<Object> overlapsX, overlapsY; //TODO finalize pair representation
-	private DoubleArrayList boundsX, boundsY;
-	private IntArrayList boundBodiesX, boundBodiesY;
-	private BooleanArrayList boundTypesX, boundTypesY; // false is min, true is max
+	private double sapAxisX, sapAxisY;
+	private HashSet<Object> sapParaOverlaps, sapPerpOverlaps; //TODO finalize implementation
+	private DoubleArrayList sapParaBounds, sapPerpBounds;
+	private BooleanArrayList sapParaBoundTypes, sapPerpBoundTypes; // false is min, true is max
+	private IntArrayList sapParaBoundBodies, sapPerpBoundBodies; // index of each bound's body in this.bodies
 	
 	public Simulation(DiscBody... bodies) {
 		
 		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
 		
-		boundsX = new DoubleArrayList();
-		boundsY = new DoubleArrayList();
-		boundBodiesX = new IntArrayList();
-		boundBodiesY = new IntArrayList();
-		boundTypesX = new BooleanArrayList();
-		boundTypesY = new BooleanArrayList();
-				
+		sapParaBounds = new DoubleArrayList();
+		sapParaBoundTypes = new BooleanArrayList();
+		sapParaBoundBodies = new IntArrayList();
+		sapPerpBounds = new DoubleArrayList();
+		sapPerpBoundTypes = new BooleanArrayList();
+		sapPerpBoundBodies = new IntArrayList();
+		
 		double[] bounds = new double[2*bodies.length];
 		
-		int[] boundBodies = new int[bounds.length];
 		boolean[] boundTypes = new boolean[bounds.length];
+		int[] boundBodies = new int[bounds.length];		
 		for(int i=0; i<bodies.length; i++) {
+			boundTypes[2*i+1] = true;
 			boundBodies[2*i] = i;
 			boundBodies[2*i+1] = i;
-			boundTypes[2*i+1] = true;
 		}
 		
-		boundsX.addAll(bounds);
-		boundsY.addAll(bounds);
-		boundBodiesX.addAll(boundBodies);
-		boundBodiesY.addAll(boundBodies);
-		boundTypesX.addAll(boundTypes);
-		boundTypesY.addAll(boundTypes);
-		
-		overlapsX = new HashSet<Object>();
-		overlapsY = new HashSet<Object>();
+		sapParaBounds.addAll(bounds);
+		sapParaBoundTypes.addAll(boundTypes);
+		sapParaBoundBodies.addAll(boundBodies);
+		sapPerpBounds.addAll(bounds);
+		sapPerpBoundTypes.addAll(boundTypes);
+		sapPerpBoundBodies.addAll(boundBodies);
 				
+		sapParaOverlaps = new HashSet<Object>();
+		sapPerpOverlaps = new HashSet<Object>();
+		
+		sapAxisX = 128;
+		sapAxisY = 72;
+		
 	}
+	
+	//TODO bodies mutators
+	//TODO sapAxis mutator
 
 	@Override
 	public Iterator<DiscBody> iterator() {
@@ -63,60 +70,58 @@ public class Simulation implements Iterable<DiscBody> {
 //		return bodies.parallelStream();
 //	}
 	
+	//TODO
 	private void initializeOverlaps(double timestep) {
 		
 	}
 	
 	public void advance(double timestep) {
 		
-		bodies.parallelStream().forEach(b->b.updateBounds(timestep));
+		bodies.parallelStream().forEach(b->b.updateSapBounds(timestep, sapAxisX, sapAxisY));
 		
 		IntStream.range(0, 2*bodies.size()).parallel().forEach(i -> {
-			
-			if (boundTypesX.get(i))
-				boundsX.set(i, bodies.get(boundBodiesX.get(i)).getMaxX());
+
+			if (sapParaBoundTypes.get(i))
+				sapParaBounds.set(i, bodies.get(sapParaBoundBodies.get(i)).getSapParaMaxBound());
 			else
-				boundsX.set(i, bodies.get(boundBodiesX.get(i)).getMinX());
+				sapParaBounds.set(i, bodies.get(sapParaBoundBodies.get(i)).getSapParaMinBound());
 			
-			if (boundTypesY.get(i))
-				boundsY.set(i, bodies.get(boundBodiesY.get(i)).getMaxY());
+			if (sapPerpBoundTypes.get(i))
+				sapPerpBounds.set(i, bodies.get(sapPerpBoundBodies.get(i)).getSapPerpMaxBound());
 			else
-				boundsY.set(i, bodies.get(boundBodiesY.get(i)).getMinY());
-			
+				sapPerpBounds.set(i, bodies.get(sapPerpBoundBodies.get(i)).getSapPerpMinBound());
+		
 		});
 		
 		IntStream.range(0, 2).parallel().forEach(axis -> {
 			
 			HashSet<Object> overlaps;
 			DoubleArrayList bounds;
-			IntArrayList boundBodies;
 			BooleanArrayList boundTypes;
+			IntArrayList boundBodies;
 			
 			if (axis == 0) {
-				overlaps = overlapsX;
-				bounds = boundsX;
-				boundBodies = boundBodiesX;
-				boundTypes = boundTypesX;
+				overlaps = sapParaOverlaps;
+				bounds = sapParaBounds;
+				boundTypes = sapParaBoundTypes;
+				boundBodies = sapParaBoundBodies;
 			}
 			else { // axis == 1
-				overlaps = overlapsY;
-				bounds = boundsY;
-				boundBodies = boundBodiesY;
-				boundTypes = boundTypesY;
+				overlaps = sapPerpOverlaps;
+				bounds = sapPerpBounds;
+				boundTypes = sapPerpBoundTypes;
+				boundBodies = sapPerpBoundBodies;
 			}
 			
-			int iterCount = 0;
 			int rightI, leftI;
 			double right;
 			for (int i=1; i<bounds.size(); i++) {
 				rightI = i;
 				right = bounds.get(rightI);
 				for (leftI = rightI-1; leftI >= 0; leftI--) {
-					iterCount++;
 					if (bounds.get(leftI) <= right)
 						break;
 					if (boundTypes.get(leftI) ^ boundTypes.get(rightI)) {
-						//TODO finalize pair representation
 						Integer pair = boundBodies.get(leftI)*boundBodies.get(rightI) + boundBodies.get(leftI) + boundBodies.get(rightI);
 						if (!overlaps.add(pair))
 							overlaps.remove(pair);
@@ -127,16 +132,12 @@ public class Simulation implements Iterable<DiscBody> {
 					rightI--;
 				}
 			}
-			Test.println(axis, iterCount);
+						
 		});
 		
-		/*
-		 * TODO only do one sweep on a customizable axis
-		 */
-		Test.println();
-		Test.println(overlapsX.size(), overlapsY.size());
-		Test.println();
-
+		long overlapCount = sapParaOverlaps.parallelStream().filter(x->sapPerpOverlaps.contains(x)).count();
+//		Test.println(overlapCount);
+		
 		bodies.parallelStream().forEach(b->b.advance(timestep));
 			
 	}
