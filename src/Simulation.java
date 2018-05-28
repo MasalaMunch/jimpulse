@@ -3,31 +3,40 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.IntStream;
 import org.eclipse.collections.api.iterator.MutableIntIterator;
+import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 public class Simulation implements Iterable<DiscBody> {
 	
 	private ArrayList<DiscBody> bodies;
-	private IntHashSet overlapsX, overlapsY;
-	//TODO use primitive ArrayLists from eclipse.collections instead of Arrays?
-	private double[] boundsX;
-	private int[] boundBodiesX;
-	private boolean[] boundTypesX; // false is min, true is max
+	//TODO decide how to represent pairs of bodies
+	private DoubleArrayList boundsX, boundsY;
+	private IntArrayList boundBodiesX, boundBodiesY;
+	private BooleanArrayList boundTypesX, boundTypesY; // false is min, true is max
 	
 	public Simulation(DiscBody... bodies) {
 		
 		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
 		
-		int length = 2*bodies.length;
-		bounds = new double[length];
-		boundBodies = new int[length];
-		boundTypes = new boolean[length];
+		double[] bounds = new double[2*bodies.length];
+		
+		int[] boundBodies = new int[bounds.length];
+		boolean[] boundTypes = new boolean[bounds.length];
 		IntStream.range(0, bodies.length).parallel().forEach(i -> {
 			boundBodies[2*i] = i;
 			boundBodies[2*i+1] = i;
 			boundTypes[2*i+1] = true;
 			});
-
+		
+		boundsX = new DoubleArrayList(bounds);
+		boundsY = new DoubleArrayList(bounds);
+		boundBodiesX = new IntArrayList(boundBodies);
+		boundBodiesY = new IntArrayList(boundBodies);
+		boundTypesX = new BooleanArrayList(boundTypes);
+		boundTypesY = new BooleanArrayList(boundTypes);
+		
 	}
 
 	@Override
