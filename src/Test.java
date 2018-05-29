@@ -15,8 +15,9 @@ public class Test extends Application {
 	private static final double TIMESTEP = 1.0/60.0;
 	private static final double RES_X = 1280;
 	private static final double RES_Y = 720;
+	private static final Color FPS_COLOR = Color.WHITE;
 	private static final Color BG_COLOR = Color.BLACK;
-	private static final Color DISC_COLOR = Color.WHITE;
+	private static final Color DISC_COLOR = Color.PURPLE;
 	private static final String WINDOW_TITLE = "Jimpulse";
 		
 	public static void main(String[] args) {
@@ -34,20 +35,18 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		int howManyBodies = 5000;
+		int howManyBodies = 10000;
 		double velRange = 50;
-		double radius = 10;
+		double radiusRange = 10;
 		DiscBody[] bodies = new DiscBody[howManyBodies];
 		for (int i=0; i<bodies.length; i++) {
 			bodies[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
 			bodies[i].setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
 			bodies[i].setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
-			bodies[i].setRadius(radius);
+			bodies[i].setRadius(Math.random()*radiusRange);
 		}
 		Simulation sim = new Simulation(bodies);
-		
-		System.gc();
-		
+				
 //		DiscBody b0 = new DiscBody(0, 0);
 //		b0.setVelX(100); b0.setVelX(100);
 //		DiscBody b1 = new DiscBody(0, RES_Y);
@@ -55,21 +54,39 @@ public class Test extends Application {
 //		DiscBody b2 = new DiscBody(RES_X, RES_Y);
 //		b2.setVelX(-100); b2.setVelY(-100);
 //		Simulation sim = new Simulation(b0, b1, b2);
-		
+				
+		System.gc();
 		new AnimationTimer() {
-			public double frames = 0;
-			public long startTime = System.nanoTime();
+			
+			long[] frameTimes = new long[100];
+			int frameTimeIndex = 0;
+			boolean arrayFilled = false;
+			
 			@Override
 			public void handle(long currentNanoTime) {
+				
 				gc.setFill(BG_COLOR);
 				gc.fillRect(0, 0, RES_X, RES_Y);
+				
 				sim.advance(TIMESTEP);
+				
 				gc.setFill(DISC_COLOR);
 				for (DiscBody db : sim)				
 					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
-//				frames++;
-//				double elapsedTime = NANOSECONDS.toSeconds(currentNanoTime-startTime);
-//				println(frames/elapsedTime); //TODO render onto the canvas instead of printing to console
+			
+				long oldFrameTime = frameTimes[frameTimeIndex];
+				frameTimes[frameTimeIndex] = currentNanoTime;
+				frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length;
+				if (frameTimeIndex == 0)
+					arrayFilled = true;
+				if (arrayFilled) {
+                    long elapsedNanos = currentNanoTime - oldFrameTime ;
+                    long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
+                    Integer frameRate = (int) (1_000_000_000.0 / elapsedNanosPerFrame);
+    				gc.setFill(FPS_COLOR);
+    				gc.fillText(frameRate.toString(), 0, RES_Y);
+				}
+				
 			}
 		}.start();
 		
