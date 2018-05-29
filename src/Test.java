@@ -35,18 +35,24 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		int howManyBodies = 10000;
-		double velRange = 50;
-		double radiusRange = 10;
+		int howManyBodies = 1000;
+		double velRange = 20;
+		double accelRange = 200;
+		double radiusRange = 15;
 		DiscBody[] bodies = new DiscBody[howManyBodies];
 		for (int i=0; i<bodies.length; i++) {
 			bodies[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
 			bodies[i].setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
 			bodies[i].setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
 			bodies[i].setRadius(Math.random()*radiusRange);
+			bodies[i].setAccelY(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
+			bodies[i].setAccelX(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
 		}
 		Simulation sim = new Simulation(bodies);
-				
+		sim.initSapBounds(TIMESTEP);
+		sim.initSapOverlaps();
+		System.gc();
+
 //		DiscBody b0 = new DiscBody(0, 0);
 //		b0.setVelX(100); b0.setVelX(100);
 //		DiscBody b1 = new DiscBody(0, RES_Y);
@@ -55,7 +61,6 @@ public class Test extends Application {
 //		b2.setVelX(-100); b2.setVelY(-100);
 //		Simulation sim = new Simulation(b0, b1, b2);
 				
-		System.gc();
 		new AnimationTimer() {
 			
 			long[] frameTimes = new long[100];
@@ -88,6 +93,7 @@ public class Test extends Application {
 				}
 				
 			}
+			
 		}.start();
 		
 		stage.show();
