@@ -9,6 +9,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
+import java.lang.ref.WeakReference;
+
 
 public class Test extends Application {
 	
@@ -37,7 +39,7 @@ public class Test extends Application {
 		
 		int howManyBodies = 1000;
 		double velRange = 20;
-		double accelRange = 200;
+		double accelRange = 50;
 		double radiusRange = 15;
 		DiscBody[] bodies = new DiscBody[howManyBodies];
 		for (int i=0; i<bodies.length; i++) {
@@ -49,9 +51,6 @@ public class Test extends Application {
 			bodies[i].setAccelX(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
 		}
 		Simulation sim = new Simulation(bodies);
-		sim.initSapBounds(TIMESTEP);
-		sim.initSapOverlaps();
-		System.gc();
 
 //		DiscBody b0 = new DiscBody(0, 0);
 //		b0.setVelX(100); b0.setVelX(100);
@@ -60,7 +59,9 @@ public class Test extends Application {
 //		DiscBody b2 = new DiscBody(RES_X, RES_Y);
 //		b2.setVelX(-100); b2.setVelY(-100);
 //		Simulation sim = new Simulation(b0, b1, b2);
-				
+		
+		forceGarbageCollection();
+		
 		new AnimationTimer() {
 			
 			long[] frameTimes = new long[100];
@@ -111,6 +112,15 @@ public class Test extends Application {
 			System.out.print(o);
 			if (++i < args.length)
 				System.out.print(" ");
+		}
+	}
+	
+	public static void forceGarbageCollection() {
+		Object object = new Object();
+		final WeakReference<Object> ref = new WeakReference<>(object);
+		object = null;
+		while (ref.get() != null) {
+		  System.gc();
 		}
 	}
 		

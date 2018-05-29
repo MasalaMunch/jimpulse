@@ -124,12 +124,11 @@ public class DiscBody {
 		this.accelY = accelY;
 	}
 
-	public void advance(double timestep, double sapAxisX, double sapAxisY) {
+	public void advance(double timestep) {
 		posX += velX*timestep;
 		posY += velY*timestep;
 		velX += accelX*timestep;
 		velY += accelY*timestep;
-		updateSapBounds(timestep, sapAxisX, sapAxisY);
 	}
 
 	public void updateSapBounds(double timestep, double sapAxisX, double sapAxisY) {
@@ -159,5 +158,5 @@ public class DiscBody {
 		}
 		
 	}
-
+	
 }
