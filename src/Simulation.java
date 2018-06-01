@@ -2,16 +2,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import org.eclipse.collections.api.iterator.MutableIntIterator;
+import org.eclipse.collections.api.map.primitive.MutableIntIntMap;
+import org.eclipse.collections.api.set.primitive.MutableIntSet;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 public class Simulation implements Iterable<DiscBody> {
 	
 	private ArrayList<DiscBody> bodies;
+	private MutableIntSet heaven;
+	private MutableIntIntMap purgatory;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
 	
@@ -60,7 +66,7 @@ public class Simulation implements Iterable<DiscBody> {
 			}
 			
 			overlaps = new IntHashSet();
-			int body1, body2;
+			int body1, body2, pair;
 			IntHashSet activeBodies = new IntHashSet();
 			MutableIntIterator iter;
 			for (int i=0; i<bounds.size(); i++) {
@@ -71,7 +77,9 @@ public class Simulation implements Iterable<DiscBody> {
 					iter = activeBodies.intIterator();
 					while(iter.hasNext()) {
 						body2 = iter.next();
-						overlaps.add(body1*body2 + body1 + body2);
+						pair = body1*body2 + body1 + body2;
+						overlaps.add(pair);
+						purgatory.addToValue(pair, 1);
 					}
 					activeBodies.add(body1);
 				}
@@ -96,7 +104,9 @@ public class Simulation implements Iterable<DiscBody> {
 			
 		}
 		
-		private void sweep() {
+		private void sweep(MutableIntIntMap candidates) {
+			
+			int iterCount = 0;
 			
 			int rightI, leftI, rightBody, leftBody, pair;
 			double right;
@@ -105,13 +115,19 @@ public class Simulation implements Iterable<DiscBody> {
 				rightBody = boundBodies.get(rightI);
 				right = bounds.get(rightI);
 				for (leftI = rightI-1; leftI >= 0; leftI--) {
+					iterCount++;
 					if (bounds.get(leftI) <= right)
 						break;
 					if (boundTypes.get(leftI) ^ boundTypes.get(rightI)) {
 						leftBody = boundBodies.get(leftI);
 						pair = leftBody*rightBody + leftBody + rightBody;
-						if (!overlaps.add(pair))
+						if (!overlaps.add(pair)) {
 							overlaps.remove(pair);
+							purgatory.addToValue(pair, -1);
+							heaven.remove(pair);
+						}
+						else
+							candidates.addToValue(pair, 1);
 					}
 					doubleSwap(bounds, leftI, rightI);
 					intSwap(boundBodies, leftI, rightI);
@@ -119,6 +135,9 @@ public class Simulation implements Iterable<DiscBody> {
 					rightI--;
 				}
 			}
+			
+//			Test.println(para, iterCount);
+			
 		}
 
 	}
@@ -137,8 +156,16 @@ public class Simulation implements Iterable<DiscBody> {
 		for (DiscBody b : bodies)
 			b.updateSapBounds(0.0, sapAxisX, sapAxisY);
 		
+		purgatory = new IntIntHashMap().asSynchronized();
+		
 		sapPara = new SAP(true);
 		sapPerp = new SAP(false);
+		
+		heaven = new IntHashSet().asSynchronized();
+		purgatory.forEachKeyValue((k,v) -> {
+			if (v == 2)
+				heaven.add(k);
+		});
 		
 	}
 	
@@ -167,12 +194,27 @@ public class Simulation implements Iterable<DiscBody> {
 			sapPerp.updateBound(i);
 		});
 		
+		MutableIntIntMap candidates = new IntIntHashMap().asSynchronized();
+		
 		IntStream.range(0, 2).parallel().forEach(axis -> {
 			if (axis == 0)
-				sapPara.sweep();
+				sapPara.sweep(candidates);
 			else
-				sapPerp.sweep();
+				sapPerp.sweep(candidates);
 		});
+		
+		final AtomicInteger iterCount = new AtomicInteger(0);
+		
+		candidates.forEachKeyValue((k, v) -> {
+			iterCount.incrementAndGet();
+			purgatory.addToValue(k, v);
+			if (purgatory.get(k) == 2)
+				heaven.add(k);
+		});
+		
+//		Test.println("both", iterCount.get());
+//		Test.println();
+//		Test.println(heaven.size());
 
 		//TODO clean up and modularize code
 		//TODO design constraint solver
