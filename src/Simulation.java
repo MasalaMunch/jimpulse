@@ -18,12 +18,13 @@ public class Simulation implements Iterable<DiscBody> {
 	private ArrayList<DiscBody> bodies;
 	private MutableIntSet heaven;
 	private MutableIntIntMap purgatory;
+	private MutableIntIntMap candidates;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
 	
 	private class SAP {
 		
-		private IntHashSet overlaps; //TODO finalize implementation
+		private IntHashSet overlaps;
 		private DoubleArrayList bounds;
 		private BooleanArrayList boundTypes; // false is min, true is max
 		private IntArrayList boundBodies; // index of each bound's body in bodies
@@ -104,7 +105,7 @@ public class Simulation implements Iterable<DiscBody> {
 			
 		}
 		
-		private void sweep(MutableIntIntMap candidates) {
+		private void sweep() {
 			
 			int iterCount = 0;
 			
@@ -121,13 +122,13 @@ public class Simulation implements Iterable<DiscBody> {
 					if (boundTypes.get(leftI) ^ boundTypes.get(rightI)) {
 						leftBody = boundBodies.get(leftI);
 						pair = leftBody*rightBody + leftBody + rightBody;
-						if (!overlaps.add(pair)) {
+						if (overlaps.add(pair))
+							candidates.addToValue(pair, 1);
+						else {
 							overlaps.remove(pair);
 							purgatory.addToValue(pair, -1);
 							heaven.remove(pair);
 						}
-						else
-							candidates.addToValue(pair, 1);
 					}
 					doubleSwap(bounds, leftI, rightI);
 					intSwap(boundBodies, leftI, rightI);
@@ -157,6 +158,7 @@ public class Simulation implements Iterable<DiscBody> {
 			b.updateSapBounds(0.0, sapAxisX, sapAxisY);
 		
 		purgatory = new IntIntHashMap().asSynchronized();
+		candidates = new IntIntHashMap().asSynchronized();
 		
 		sapPara = new SAP(true);
 		sapPerp = new SAP(false);
@@ -193,27 +195,20 @@ public class Simulation implements Iterable<DiscBody> {
 			sapPara.updateBound(i);
 			sapPerp.updateBound(i);
 		});
-		
-		MutableIntIntMap candidates = new IntIntHashMap().asSynchronized();
-		
+				
 		IntStream.range(0, 2).parallel().forEach(axis -> {
 			if (axis == 0)
-				sapPara.sweep(candidates);
+				sapPara.sweep();
 			else
-				sapPerp.sweep(candidates);
+				sapPerp.sweep();
 		});
-		
-		final AtomicInteger iterCount = new AtomicInteger(0);
 		
 		candidates.forEachKeyValue((k, v) -> {
-			iterCount.incrementAndGet();
-			purgatory.addToValue(k, v);
-			if (purgatory.get(k) == 2)
+			if (purgatory.addToValue(k, v) == 2)
 				heaven.add(k);
 		});
+		candidates.clear();
 		
-//		Test.println("both", iterCount.get());
-//		Test.println();
 //		Test.println(heaven.size());
 
 		//TODO clean up and modularize code
