@@ -16,15 +16,14 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 public class Simulation implements Iterable<DiscBody> {
 	
 	private ArrayList<DiscBody> bodies;
-	private MutableIntSet heaven;
-	private MutableIntIntMap purgatory;
-	private MutableIntIntMap candidates;
+	private MutableIntSet aabbOverlaps;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
 	
 	private class SAP {
 		
 		private IntHashSet overlaps;
+		private IntHashSet newOverlaps;
 		private DoubleArrayList bounds;
 		private BooleanArrayList boundTypes; // false is min, true is max
 		private IntArrayList boundBodies; // index of each bound's body in bodies
@@ -80,11 +79,12 @@ public class Simulation implements Iterable<DiscBody> {
 						body2 = iter.next();
 						pair = body1*body2 + body1 + body2;
 						overlaps.add(pair);
-						purgatory.addToValue(pair, 1);
 					}
 					activeBodies.add(body1);
 				}
 			}
+			
+			newOverlaps = new IntHashSet();
 
 		}
 				
@@ -107,7 +107,7 @@ public class Simulation implements Iterable<DiscBody> {
 		
 		private void sweep() {
 			
-			int iterCount = 0;
+//			int iterCount = 0;
 			
 			int rightI, leftI, rightBody, leftBody, pair;
 			double right;
@@ -116,18 +116,17 @@ public class Simulation implements Iterable<DiscBody> {
 				rightBody = boundBodies.get(rightI);
 				right = bounds.get(rightI);
 				for (leftI = rightI-1; leftI >= 0; leftI--) {
-					iterCount++;
+//					iterCount++;
 					if (bounds.get(leftI) <= right)
 						break;
 					if (boundTypes.get(leftI) ^ boundTypes.get(rightI)) {
 						leftBody = boundBodies.get(leftI);
 						pair = leftBody*rightBody + leftBody + rightBody;
 						if (overlaps.add(pair))
-							candidates.addToValue(pair, 1);
+							newOverlaps.add(pair);
 						else {
 							overlaps.remove(pair);
-							purgatory.addToValue(pair, -1);
-							heaven.remove(pair);
+							aabbOverlaps.remove(pair);
 						}
 					}
 					doubleSwap(bounds, leftI, rightI);
@@ -157,16 +156,13 @@ public class Simulation implements Iterable<DiscBody> {
 		for (DiscBody b : bodies)
 			b.updateSapBounds(0.0, sapAxisX, sapAxisY);
 		
-		purgatory = new IntIntHashMap().asSynchronized();
-		candidates = new IntIntHashMap().asSynchronized();
-		
 		sapPara = new SAP(true);
 		sapPerp = new SAP(false);
 		
-		heaven = new IntHashSet().asSynchronized();
-		purgatory.forEachKeyValue((k,v) -> {
-			if (v == 2)
-				heaven.add(k);
+		aabbOverlaps = new IntHashSet().asSynchronized();
+		sapPara.overlaps.forEach(pair -> {
+			if (sapPerp.overlaps.contains(pair))
+				aabbOverlaps.add(pair);
 		});
 		
 	}
@@ -203,13 +199,28 @@ public class Simulation implements Iterable<DiscBody> {
 				sapPerp.sweep();
 		});
 		
-		candidates.forEachKeyValue((k, v) -> {
-			if (purgatory.addToValue(k, v) == 2)
-				heaven.add(k);
-		});
-		candidates.clear();
+//		Test.println(sapPara.newOverlaps.size(), sapPerp.newOverlaps.size());
 		
-//		Test.println(heaven.size());
+		IntStream.range(0, 2).parallel().forEach(axis -> {
+			
+			if (axis == 0) {
+				sapPara.newOverlaps.forEach(pair -> {
+					if (sapPerp.overlaps.contains(pair))
+						aabbOverlaps.add(pair);
+				});
+				sapPara.newOverlaps.clear();
+			}
+			else {
+				sapPerp.newOverlaps.forEach(pair -> {
+					if (sapPara.overlaps.contains(pair))
+						aabbOverlaps.add(pair);
+				});
+				sapPerp.newOverlaps.clear();
+			}
+				
+		});
+		
+		Test.println(aabbOverlaps.size());
 
 		//TODO clean up and modularize code
 		//TODO design constraint solver

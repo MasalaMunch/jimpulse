@@ -37,11 +37,11 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		int howManyBodies = 10000;
-		double velRange = 10;
+		int bodyCount = 10000;
+		double velRange = 15;
 		double accelRange = 0;
 		double radiusRange = 10;
-		DiscBody[] bodies = new DiscBody[howManyBodies];
+		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {
 			bodies[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
 			bodies[i].setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
