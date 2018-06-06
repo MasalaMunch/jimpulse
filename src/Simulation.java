@@ -222,7 +222,8 @@ public class Simulation implements Iterable<DiscBody> {
 		
 		Test.println(aabbOverlaps.size());
 
-		//TODO clean up and modularize code
+		//TODO clean up and modularize code, remove all parallelization for now to make development faster (you can design with future parallelization in mind tho)
+		//TODO how can the single-threaded bottleneck that is SAP can be further divided into independent subtasks (spatial partitioning, multi-SAP, etc)
 		//TODO design constraint solver
 		
 		bodies.parallelStream().forEach(b -> b.advance(timestep));
