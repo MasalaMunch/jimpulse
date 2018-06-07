@@ -9,15 +9,12 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 public class SAP {
 	
-	private double axisX;
-	private double axisY;
+	private double axisX, axisY;
 	private ArrayList<DiscBody> bodies;
 	private DoubleArrayList bounds;
 	private BooleanArrayList boundTypes; // false is min, true is max
 	private IntArrayList boundBodies; // index of each bound's body in bodies
-	private IntHashSet overlaps;
-	private IntHashSet addedOverlaps;
-	private IntHashSet removedOverlaps;
+	private IntHashSet overlaps, addedOverlaps, removedOverlaps;
 	
 	public SAP(double axisX, double axisY, DiscBody... bodies) {
 		

@@ -65,9 +65,11 @@ public class Simulation implements Iterable<DiscBody> {
 				aabbOverlaps.add(pair);
 		});
 		
-		Test.println(aabbOverlaps.size());
+		Test.println(sapPara.getOverlaps().size(), sapPerp.getOverlaps().size(), aabbOverlaps.size());
+		Test.println(sapPara.getRemovedOverlaps().size(), sapPerp.getRemovedOverlaps().size());
+		Test.println(sapPara.getAddedOverlaps().size(), sapPerp.getAddedOverlaps().size());
+		Test.println();
 
-		//TODO how can the single-threaded bottleneck that is sweep() be divided into independent subtasks (spatial partitioning, multi-SAP, shellsort, etc)
 		//TODO design constraint solver
 		
 		for (DiscBody b : bodies)

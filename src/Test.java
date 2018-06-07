@@ -36,7 +36,7 @@ public class Test extends Application {
 		
 		int bodyCount = 5000;
 		double velRange = 15;
-		double accelRange = 0;
+		double accelRange = 50;
 		double radiusRange = 10;
 		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {
