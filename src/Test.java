@@ -1,4 +1,3 @@
-import java.util.stream.Stream;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -7,8 +6,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-
 import java.lang.ref.WeakReference;
 
 
@@ -37,7 +34,7 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		int bodyCount = 10000;
+		int bodyCount = 5000;
 		double velRange = 15;
 		double accelRange = 0;
 		double radiusRange = 10;

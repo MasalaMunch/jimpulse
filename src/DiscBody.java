@@ -7,8 +7,6 @@ public class DiscBody {
 	private double velX, velY;
 	private double forceX, forceY;
 	private double accelX, accelY;
-	private double sapParaMinBound, sapParaMaxBound;
-	private double sapPerpMinBound, sapPerpMaxBound;
 	
 	public double getMass() {
 		return mass;
@@ -52,22 +50,6 @@ public class DiscBody {
 
 	public double getAccelY() {
 		return accelY;
-	}
-
-	public double getSapParaMinBound() {
-		return sapParaMinBound;
-	}
-
-	public double getSapParaMaxBound() {
-		return sapParaMaxBound;
-	}
-
-	public double getSapPerpMinBound() {
-		return sapPerpMinBound;
-	}
-
-	public double getSapPerpMaxBound() {
-		return sapPerpMaxBound;
 	}
 
 	public DiscBody(double posX, double posY) {
@@ -129,34 +111,6 @@ public class DiscBody {
 		posY += velY*timestep;
 		velX += accelX*timestep;
 		velY += accelY*timestep;
-	}
-
-	public void updateSapBounds(double timestep, double sapAxisX, double sapAxisY) {
-		
-		final double sapParaPos = posX*sapAxisX + posY*sapAxisY;
-		final double sapParaPosChange = timestep*(velX*sapAxisX + velY*sapAxisY);
-		
-		if (sapParaPosChange > 0) {
-			sapParaMinBound = sapParaPos - radius;
-			sapParaMaxBound = sapParaPos + radius + sapParaPosChange;
-		}
-		else { // sapParaPosChange <= 0
-			sapParaMinBound = sapParaPos - radius + sapParaPosChange;
-			sapParaMaxBound = sapParaPos + radius;
-		}
-		
-		final double sapPerpPos = posX*sapAxisY - posY*sapAxisX;
-		final double sapPerpPosChange = timestep*(velX*sapAxisY - velY*sapAxisX);
-		
-		if (sapPerpPosChange > 0) {
-			sapPerpMinBound = sapPerpPos - radius;
-			sapPerpMaxBound = sapPerpPos + radius + sapPerpPosChange;
-		}
-		else { // sapPerpPosChange <= 0
-			sapPerpMinBound = sapPerpPos - radius + sapPerpPosChange;
-			sapPerpMaxBound = sapPerpPos + radius;
-		}
-		
 	}
 	
 }
