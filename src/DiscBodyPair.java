@@ -1,4 +1,4 @@
-
+import java.util.Arrays;
 
 public class DiscBodyPair {
 	
@@ -17,7 +17,15 @@ public class DiscBodyPair {
 		return maxBodyIndex;
 	}
 	
-	public boolean equals(DiscBodyPair other) {
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof DiscBodyPair)
+			return equals((DiscBodyPair) o);
+		else
+			return false;
+	}
+	
+	private boolean equals(DiscBodyPair other) {
 		return (minBodyIndex == other.minBodyIndex
 				&& maxBodyIndex == other.maxBodyIndex);
 	}
@@ -27,5 +35,10 @@ public class DiscBodyPair {
 		return (minBodyIndex * maxBodyIndex 
 				+ minBodyIndex + maxBodyIndex);
 	}
-
+	
+	@Override
+	public String toString() {
+		return Arrays.toString(new int[]{minBodyIndex, maxBodyIndex});
+	}
+	
 }

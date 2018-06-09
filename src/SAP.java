@@ -5,6 +5,7 @@ import org.eclipse.collections.api.iterator.MutableIntIterator;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 public class SAP {
@@ -14,7 +15,7 @@ public class SAP {
 	private DoubleArrayList bounds;
 	private BooleanArrayList boundTypes; // false is min, true is max
 	private IntArrayList boundBodies; // index of each bound's body in bodies
-	private IntHashSet overlaps, addedOverlaps, removedOverlaps;
+	private UnifiedSet<DiscBodyPair> overlaps, addedOverlaps, removedOverlaps;
 	
 	public SAP(double axisX, double axisY, DiscBody... bodies) {
 		
@@ -52,7 +53,7 @@ public class SAP {
 			boundBodies.set(i, oldBoundBodies.get(j));
 		}
 
-		overlaps = new IntHashSet();
+		overlaps = new UnifiedSet<DiscBodyPair>();
 		
 		IntHashSet activeBodies = new IntHashSet();
 		for (int i=0; i<bounds.size(); i++) {
@@ -63,27 +64,28 @@ public class SAP {
 				MutableIntIterator iter = activeBodies.intIterator();
 				while(iter.hasNext()) {
 					int body2 = iter.next();
-					int pair = body1*body2 + body1 + body2;
+					boolean order = body1 < body2;
+					DiscBodyPair pair = new DiscBodyPair(order? body1:body2, order? body2:body1);
 					overlaps.add(pair);
 				}
 				activeBodies.add(body1);
 			}
 		}
 
-		addedOverlaps = new IntHashSet();
-		removedOverlaps = new IntHashSet();
+		addedOverlaps = new UnifiedSet<DiscBodyPair>();
+		removedOverlaps = new UnifiedSet<DiscBodyPair>();
 
 	}
 	
-	public IntHashSet getOverlaps() {
+	public UnifiedSet<DiscBodyPair> getOverlaps() {
 		return overlaps;
 	}
 
-	public IntHashSet getAddedOverlaps() {
+	public UnifiedSet<DiscBodyPair> getAddedOverlaps() {
 		return addedOverlaps;
 	}
 
-	public IntHashSet getRemovedOverlaps() {
+	public UnifiedSet<DiscBodyPair> getRemovedOverlaps() {
 		return removedOverlaps;
 	}
 
@@ -114,7 +116,6 @@ public class SAP {
 		addedOverlaps.clear();
 		removedOverlaps.clear();
 		
-		int bodyCount = bodies.size();
 		for (int i=1; i<bounds.size(); i++) {
 			int rightI = i;
 			int rightBody = boundBodies.get(rightI);
@@ -124,7 +125,8 @@ public class SAP {
 					break;
 				if (boundTypes.get(leftI) ^ boundTypes.get(rightI)) {
 					int leftBody = boundBodies.get(leftI);
-					int pair = getPairIndex(leftBody, rightBody, bodyCount);
+					boolean order = leftBody < rightBody;
+					DiscBodyPair pair = new DiscBodyPair(order? leftBody:rightBody, order? rightBody:leftBody);
 					if (overlaps.add(pair))
 						addedOverlaps.add(pair);
 					else {
@@ -139,13 +141,6 @@ public class SAP {
 			}
 		}
 		
-	}
-	
-	private static int getPairIndex(int body1, int body2, int bodyCount) {	
-		int minBody = Math.min(body1, body2);
-		int subseqIndex = Simulation.getPairSubseqIndex(minBody, bodyCount);
-		int maxBody = minBody==body1? body2 : body1;
-		return subseqIndex + maxBody - minBody - 1;
 	}
 	
 	private static void doubleSwap(DoubleArrayList a, int i, int j) {
