@@ -114,6 +114,7 @@ public class SAP {
 		addedOverlaps.clear();
 		removedOverlaps.clear();
 		
+		int bodyCount = bodies.size();
 		for (int i=1; i<bounds.size(); i++) {
 			int rightI = i;
 			int rightBody = boundBodies.get(rightI);
@@ -123,7 +124,7 @@ public class SAP {
 					break;
 				if (boundTypes.get(leftI) ^ boundTypes.get(rightI)) {
 					int leftBody = boundBodies.get(leftI);
-					int pair = leftBody*rightBody + leftBody + rightBody;
+					int pair = getPairIndex(leftBody, rightBody, bodyCount);
 					if (overlaps.add(pair))
 						addedOverlaps.add(pair);
 					else {
@@ -138,6 +139,13 @@ public class SAP {
 			}
 		}
 		
+	}
+	
+	private static int getPairIndex(int body1, int body2, int bodyCount) {	
+		int minBody = Math.min(body1, body2);
+		int subseqIndex = Simulation.getPairSubseqIndex(minBody, bodyCount);
+		int maxBody = minBody==body1? body2 : body1;
+		return subseqIndex + maxBody - minBody - 1;
 	}
 	
 	private static void doubleSwap(DoubleArrayList a, int i, int j) {
