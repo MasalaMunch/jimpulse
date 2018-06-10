@@ -116,15 +116,13 @@ public class SAP {
 		final int boundCount = bounds.size();
 		for (int i=1; i<boundCount; i++) {
 			int rightIndex = i;
-			int rightBodyIndex = boundBodyIndices.get(rightIndex);
-			double right = bounds.get(rightIndex);
 			for (int leftIndex = rightIndex-1; leftIndex >= 0; leftIndex--) {
-				if (bounds.get(leftIndex) <= right)
+				if (bounds.get(leftIndex) <= bounds.get(rightIndex))
 					break;
 				if (boundTypes.get(leftIndex) ^ boundTypes.get(rightIndex)) {
 					BodyIndexPair overlap = new BodyIndexPair(
 							boundBodyIndices.get(leftIndex),
-							rightBodyIndex
+							boundBodyIndices.get(rightIndex)
 							);
 					if (overlaps.add(overlap))
 						addedOverlaps.add(overlap);
