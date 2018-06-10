@@ -35,7 +35,7 @@ public class Test extends Application {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
 		int bodyCount = 5000;
-		double velRange = 15;
+		double velRange = 10;
 		double accelRange = 0;
 		double radiusRange = 10;
 		DiscBody[] bodies = new DiscBody[bodyCount];
@@ -45,6 +45,7 @@ public class Test extends Application {
 			bodies[i].setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
 			bodies[i].setRadius(Math.random()*radiusRange);
 			bodies[i].setAccelY(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
+//			bodies[i].setAccelY(200); // gravity
 			bodies[i].setAccelX(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
 		}
 		Simulation sim = new Simulation(bodies);

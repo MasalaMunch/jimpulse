@@ -1,0 +1,1222 @@
+JAVA PROFILE 1.0.1, created Sun Jun 10 10:57:38 2018
+
+Copyright (c) 2003, 2005, Oracle and/or its affiliates. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+  - Neither the name of Oracle nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+Header for -agentlib:hprof (or -Xrunhprof) ASCII Output (JDK 5.0 JVMTI based)
+
+WARNING!  This file format is under development, and is subject to
+change without notice.
+
+This file contains the following types of records:
+
+THREAD START
+THREAD END      mark the lifetime of Java threads
+
+TRACE           represents a Java stack trace.  Each trace consists
+                of a series of stack frames.  Other records refer to
+                TRACEs to identify (1) where object allocations have
+                taken place, (2) the frames in which GC roots were
+                found, and (3) frequently executed methods.
+
+HEAP DUMP       is a complete snapshot of all live objects in the Java
+                heap.  Following distinctions are made:
+
+                ROOT    root set as determined by GC
+                CLS     classes 
+                OBJ     instances
+                ARR     arrays
+
+SITES           is a sorted list of allocation sites.  This identifies
+                the most heavily allocated object types, and the TRACE
+                at which those allocations occurred.
+
+CPU SAMPLES     is a statistical profile of program execution.  The VM
+                periodically samples all running threads, and assigns
+                a quantum to active TRACEs in those threads.  Entries
+                in this record are TRACEs ranked by the percentage of
+                total quanta they consumed; top-ranked TRACEs are
+                typically hot spots in the program.
+
+CPU TIME        is a profile of program execution obtained by measuring
+                the time spent in individual methods (excluding the time
+                spent in callees), as well as by counting the number of
+                times each method is called. Entries in this record are
+                TRACEs ranked by the percentage of total CPU time. The
+                "count" field indicates the number of times each TRACE 
+                is invoked.
+
+MONITOR TIME    is a profile of monitor contention obtained by measuring
+                the time spent by a thread waiting to enter a monitor.
+                Entries in this record are TRACEs ranked by the percentage
+                of total monitor contention time and a brief description
+                of the monitor.  The "count" field indicates the number of 
+                times the monitor was contended at that TRACE.
+
+MONITOR DUMP    is a complete snapshot of all the monitors and threads in 
+                the System.
+
+HEAP DUMP, SITES, CPU SAMPLES|TIME and MONITOR DUMP|TIME records are generated 
+at program exit.  They can also be obtained during program execution by typing 
+Ctrl-\ (on Solaris) or by typing Ctrl-Break (on Win32).
+
+--------
+
+THREAD START (obj=500001a4, id = 200001, name="main", group="main")
+THREAD START (obj=500001a4, id = 200004, name="QuantumRenderer-0", group="main")
+THREAD START (obj=500003ab, id = 200005, name="Thread-1", group="main")
+THREAD START (obj=500001a4, id = 200006, name="WindowsNativeRunloopThread", group="main")
+THREAD START (obj=500001a4, id = 200007, name="JavaFX-Launcher", group="main")
+THREAD START (obj=500001a4, id = 200008, name="Thread-3", group="main")
+THREAD START (obj=500001a4, id = 200009, name="Prism Font Disposer", group="system")
+THREAD END (id = 200007)
+THREAD END (id = 200001)
+THREAD START (obj=500001a4, id = 200010, name="DestroyJavaVM", group="main")
+THREAD END (id = 200006)
+THREAD END (id = 200010)
+THREAD END (id = 200002)
+TRACE 300591:
+	Simulation.advance(Simulation.java:96)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300592:
+	Simulation.advance(Simulation.java:102)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300501:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains(IntObjectHashMap.java:513)
+	Simulation.addAabbOverlap(Simulation.java:47)
+	Simulation.lambda$0(Simulation.java:41)
+	Simulation$$Lambda$70.437180575.value(<Unknown Source>:Unknown line)
+TRACE 300552:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains(IntObjectHashMap.java:513)
+	Simulation.addAabbOverlap(Simulation.java:47)
+	Simulation.advance(Simulation.java:99)
+	Test$1.handle(Test.java:75)
+TRACE 300553:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains(IntObjectHashMap.java:513)
+	Simulation.addAabbOverlap(Simulation.java:47)
+	Simulation.advance(Simulation.java:105)
+	Test$1.handle(Test.java:75)
+TRACE 300595:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd(UnifiedSet.java:327)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.add(UnifiedSet.java:257)
+	Simulation.addAabbOverlap(Simulation.java:59)
+	Simulation.advance(Simulation.java:105)
+TRACE 300590:
+	java.util.HashMap.getNode(<Unknown Source>:Unknown line)
+	java.util.HashMap.containsKey(<Unknown Source>:Unknown line)
+	Simulation.addAabbOverlap(Simulation.java:48)
+	Simulation.advance(Simulation.java:99)
+TRACE 300615:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd(UnifiedSet.java:283)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.add(UnifiedSet.java:257)
+	Simulation.addAabbOverlap(Simulation.java:59)
+	Simulation.advance(Simulation.java:105)
+TRACE 300233:
+	com.sun.glass.ui.win.WinApplication._runLoop(WinApplication.java:Unknown line)
+	com.sun.glass.ui.win.WinApplication.lambda$null$148(WinApplication.java:191)
+	com.sun.glass.ui.win.WinApplication$$Lambda$38.849460928.run(<Unknown Source>:Unknown line)
+	java.lang.Thread.run(<Unknown Source>:Unknown line)
+TRACE 300617:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd(UnifiedSet.java:276)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.add(UnifiedSet.java:257)
+	Simulation.addAabbOverlap(Simulation.java:59)
+	Simulation.advance(Simulation.java:105)
+TRACE 300599:
+	java.util.HashMap.getNode(<Unknown Source>:Unknown line)
+	java.util.HashMap.containsKey(<Unknown Source>:Unknown line)
+	Simulation.addAabbOverlap(Simulation.java:48)
+	Simulation.advance(Simulation.java:105)
+TRACE 300092:
+	java.lang.ClassLoader.defineClass1(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.security.SecureClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.defineClass(<Unknown Source>:Unknown line)
+TRACE 300588:
+	Simulation.advance(Simulation.java:105)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300596:
+	java.util.HashMap.remove(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:162)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+TRACE 300579:
+	SAP.sweep(SAP.java:168)
+	Simulation.advance(Simulation.java:76)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300656:
+	com.sun.prism.impl.ps.BaseShaderContext.validatePaintOp(BaseShaderContext.java:477)
+	com.sun.prism.impl.ps.BaseShaderContext.validatePaintOp(BaseShaderContext.java:348)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedPgram(BaseShaderGraphics.java:898)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedRect(BaseShaderGraphics.java:601)
+TRACE 300604:
+	Simulation.advance(Simulation.java:99)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300613:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each(IntHashSet.java:544)
+	Simulation.advance(Simulation.java:83)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300614:
+	java.util.HashMap.remove(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:163)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+TRACE 300567:
+	com.sun.prism.d3d.D3DSwapChain.nPresent(D3DSwapChain.java:Unknown line)
+	com.sun.prism.d3d.D3DSwapChain.present(D3DSwapChain.java:81)
+	com.sun.javafx.tk.quantum.PresentingPainter.run(PresentingPainter.java:106)
+	java.util.concurrent.Executors$RunnableAdapter.call(<Unknown Source>:Unknown line)
+TRACE 300581:
+	java.util.HashMap.hash(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:154)
+	Simulation.advance(Simulation.java:75)
+TRACE 300582:
+	Simulation.advance(Simulation.java:72)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300431:
+	sun.security.provider.DigestBase.implCompressMultiBlock(<Unknown Source>:Unknown line)
+	sun.security.provider.DigestBase.engineUpdate(<Unknown Source>:Unknown line)
+	java.security.MessageDigest$Delegate.engineUpdate(<Unknown Source>:Unknown line)
+	java.security.MessageDigest.update(<Unknown Source>:Unknown line)
+TRACE 300566:
+	com.sun.prism.d3d.D3DContext.nDrawIndexedQuads(D3DContext.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.renderQuads(D3DContext.java:547)
+	com.sun.prism.impl.BaseContext.drawQuads(BaseContext.java:119)
+	com.sun.prism.impl.VertexBuffer.addMappedPgram(VertexBuffer.java:437)
+TRACE 300606:
+	org.eclipse.collections.impl.SpreadFunctions.intSpreadTwo(SpreadFunctions.java:92)
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.spreadTwoAndMask(IntObjectHashMap.java:3138)
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.probeTwo(IntObjectHashMap.java:3084)
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.probe(IntObjectHashMap.java:3079)
+TRACE 300583:
+	SAP.sweep(SAP.java:168)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300560:
+	com.sun.prism.d3d.D3DContext.nDrawIndexedQuads(D3DContext.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.renderQuads(D3DContext.java:547)
+	com.sun.prism.impl.BaseContext.drawQuads(BaseContext.java:119)
+	com.sun.prism.impl.VertexBuffer.flush(VertexBuffer.java:98)
+TRACE 300597:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each(IntHashSet.java:544)
+	Simulation.advance(Simulation.java:80)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300610:
+	Simulation.addAabbOverlap(Simulation.java:47)
+	Simulation.advance(Simulation.java:99)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300209:
+	java.util.zip.ZipFile.read(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile.access$1400(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile$ZipFileInputStream.read(<Unknown Source>:Unknown line)
+	sun.misc.Resource.getBytes(<Unknown Source>:Unknown line)
+TRACE 300533:
+	com.sun.glass.ui.win.WinWindow._createWindow(WinWindow.java:Unknown line)
+	com.sun.glass.ui.Window.<init>(Window.java:273)
+	com.sun.glass.ui.win.WinWindow.<init>(WinWindow.java:44)
+	com.sun.glass.ui.win.WinApplication.createWindow(WinApplication.java:236)
+TRACE 300619:
+	com.sun.prism.impl.ps.BaseShaderContext.validatePaintOp(BaseShaderContext.java:348)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedPgram(BaseShaderGraphics.java:898)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedRect(BaseShaderGraphics.java:601)
+	com.sun.prism.impl.ps.BaseShaderGraphics.fillEllipse(BaseShaderGraphics.java:1534)
+TRACE 300654:
+	SAP.sweep(SAP.java:154)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300142:
+	sun.misc.Unsafe.defineAnonymousClass(<Unknown Source>:Unknown line)
+	java.lang.invoke.InvokerBytecodeGenerator.loadAndInitializeInvokerClass(<Unknown Source>:Unknown line)
+	java.lang.invoke.InvokerBytecodeGenerator.loadMethod(<Unknown Source>:Unknown line)
+	java.lang.invoke.InvokerBytecodeGenerator.generateCustomizedCode(<Unknown Source>:Unknown line)
+TRACE 300593:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet$ChainedBucket.<init>(UnifiedSet.java:1811)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd(UnifiedSet.java:327)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.add(UnifiedSet.java:257)
+	Simulation.addAabbOverlap(Simulation.java:59)
+TRACE 300594:
+	Simulation.advance(Simulation.java:73)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300576:
+	Test$1.handle(Test.java:78)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+TRACE 300568:
+	SAP.sweep(SAP.java:151)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300229:
+	com.sun.prism.d3d.D3DResourceFactory.nGetContext(D3DResourceFactory.java:Unknown line)
+	com.sun.prism.d3d.D3DPipeline.createResourceFactory(D3DPipeline.java:172)
+	com.sun.prism.d3d.D3DPipeline.getD3DResourceFactory(D3DPipeline.java:179)
+	com.sun.prism.d3d.D3DPipeline.findDefaultResourceFactory(D3DPipeline.java:211)
+TRACE 300616:
+	SAP.sweep(SAP.java:140)
+	Simulation.advance(Simulation.java:76)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300630:
+	java.util.HashMap.hash(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:155)
+	Simulation.advance(Simulation.java:75)
+TRACE 300547:
+	SAP.updateBounds(SAP.java:118)
+	Simulation.advance(Simulation.java:72)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300545:
+	com.sun.glass.ui.win.WinApplication._submitForLaterInvocation(WinApplication.java:Unknown line)
+	com.sun.glass.ui.win.WinApplication.submitForLaterInvocation(WinApplication.java:338)
+	com.sun.glass.ui.InvokeLaterDispatcher.run(InvokeLaterDispatcher.java:122)
+TRACE 300540:
+	com.sun.glass.ui.win.WinWindow._requestFocus(WinWindow.java:Unknown line)
+	com.sun.glass.ui.Window.requestFocus(Window.java:727)
+	com.sun.glass.ui.Window.requestFocus(Window.java:732)
+	com.sun.javafx.tk.quantum.WindowStage.requestFocus(WindowStage.java:817)
+TRACE 300611:
+	Test$1.handle(Test.java:79)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+TRACE 300502:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each(IntHashSet.java:544)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.forEach(IntHashSet.java:523)
+	Simulation.<init>(Simulation.java:39)
+	Test.start(Test.java:51)
+TRACE 300586:
+	java.util.HashMap.removeNode(<Unknown Source>:Unknown line)
+	java.util.HashMap.remove(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:162)
+	Simulation.advance(Simulation.java:75)
+TRACE 300657:
+	javafx.scene.canvas.GraphicsContext.setFill(GraphicsContext.java:1161)
+	Test$1.handle(Test.java:90)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300493:
+	SAP.<init>(SAP.java:77)
+	Simulation.<init>(Simulation.java:34)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+TRACE 300660:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.removeFromChain(UnifiedSet.java:1166)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.remove(UnifiedSet.java:1151)
+	Simulation.lambda$1(Simulation.java:81)
+	Simulation$$Lambda$96.468127645.value(<Unknown Source>:Unknown line)
+TRACE 300486:
+	SAP.<init>(SAP.java:77)
+	Simulation.<init>(Simulation.java:31)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+TRACE 300602:
+	Simulation.advance(Simulation.java:116)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300662:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probe(IntHashSet.java:1011)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.add(IntHashSet.java:223)
+	SAP.sweep(SAP.java:151)
+	Simulation.advance(Simulation.java:75)
+TRACE 300485:
+	SAP.<init>(SAP.java:79)
+	Simulation.<init>(Simulation.java:31)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+TRACE 300483:
+	SAP.<init>(SAP.java:75)
+	Simulation.<init>(Simulation.java:31)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+TRACE 300480:
+	java.util.zip.Inflater.inflateBytes(<Unknown Source>:Unknown line)
+	java.util.zip.Inflater.inflate(<Unknown Source>:Unknown line)
+	java.util.zip.InflaterInputStream.read(<Unknown Source>:Unknown line)
+	java.util.jar.JarVerifier$VerifierStream.read(<Unknown Source>:Unknown line)
+TRACE 300459:
+	java.net.URLClassLoader.findClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+	sun.misc.Launcher$AppClassLoader.loadClass(<Unknown Source>:Unknown line)
+TRACE 300668:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.probe(IntObjectHashMap.java:3079)
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put(IntObjectHashMap.java:2303)
+	Simulation.addAabbOverlap(Simulation.java:51)
+	Simulation.advance(Simulation.java:105)
+TRACE 300234:
+	java.util.zip.ZipFile.getEntry(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile.getEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getJarEntry(<Unknown Source>:Unknown line)
+TRACE 300620:
+	SAP.sweep(SAP.java:140)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300598:
+	com.sun.prism.d3d.D3DResourceFactory.nTestCooperativeLevel(D3DResourceFactory.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.testLostStateAndReset(D3DContext.java:149)
+	com.sun.prism.d3d.D3DResourceFactory.isDeviceReady(D3DResourceFactory.java:116)
+	com.sun.javafx.tk.quantum.PresentingPainter.run(PresentingPainter.java:71)
+TRACE 300600:
+	javafx.scene.Parent.updateBounds(Parent.java:1716)
+	javafx.scene.Scene$ScenePulseListener.pulse(Scene.java:2404)
+	com.sun.javafx.tk.Toolkit.lambda$runPulse$30(Toolkit.java:355)
+	com.sun.javafx.tk.Toolkit$$Lambda$98.1870683510.run(<Unknown Source>:Unknown line)
+TRACE 300062:
+	sun.misc.URLClassPath$JarLoader$1.run(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath$JarLoader$1.run(<Unknown Source>:Unknown line)
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath$JarLoader.ensureOpen(<Unknown Source>:Unknown line)
+TRACE 300601:
+	java.lang.Thread.isInterrupted(<Unknown Source>:Unknown line)
+	java.lang.Thread.interrupted(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireSharedInterruptibly(<Unknown Source>:Unknown line)
+	java.util.concurrent.CountDownLatch.await(<Unknown Source>:Unknown line)
+TRACE 300603:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet$ChainedBucket.access$302(UnifiedSet.java:1811)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd(UnifiedSet.java:307)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.add(UnifiedSet.java:257)
+	Simulation.addAabbOverlap(Simulation.java:59)
+TRACE 300589:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.removeDeepChain(UnifiedSet.java:1233)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.removeFromChain(UnifiedSet.java:1200)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.remove(UnifiedSet.java:1151)
+	Simulation.lambda$1(Simulation.java:81)
+TRACE 300605:
+	java.io.FileOutputStream.writeBytes(<Unknown Source>:Unknown line)
+	java.io.FileOutputStream.write(<Unknown Source>:Unknown line)
+	java.io.BufferedOutputStream.flushBuffer(<Unknown Source>:Unknown line)
+	java.io.BufferedOutputStream.flush(<Unknown Source>:Unknown line)
+TRACE 300587:
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.release(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.ReentrantLock.unlock(<Unknown Source>:Unknown line)
+	java.util.concurrent.LinkedBlockingDeque.offerLast(<Unknown Source>:Unknown line)
+	java.util.concurrent.LinkedBlockingDeque.addLast(<Unknown Source>:Unknown line)
+TRACE 300607:
+	Simulation.addAabbOverlap(Simulation.java:54)
+	Simulation.advance(Simulation.java:99)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300585:
+	Simulation.advance(Simulation.java:115)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300584:
+	SAP.sweep(SAP.java:145)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300071:
+	java.util.jar.JarFile.match(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.checkForSpecialAttributes(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.hasClassPathAttribute(<Unknown Source>:Unknown line)
+	java.util.jar.JavaUtilJarAccessImpl.jarFileHasClassPathAttribute(<Unknown Source>:Unknown line)
+TRACE 300612:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put(IntObjectHashMap.java:2303)
+	Simulation.addAabbOverlap(Simulation.java:51)
+	Simulation.advance(Simulation.java:105)
+	Test$1.handle(Test.java:75)
+TRACE 300618:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd(UnifiedSet.java:303)
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.add(UnifiedSet.java:257)
+	Simulation.addAabbOverlap(Simulation.java:59)
+	Simulation.advance(Simulation.java:99)
+TRACE 300621:
+	com.sun.javafx.geom.transform.Affine3D.<init>(Affine3D.java:44)
+	com.sun.prism.impl.BaseGraphics.<init>(BaseGraphics.java:61)
+	com.sun.prism.impl.ps.BaseShaderGraphics.<init>(BaseShaderGraphics.java:86)
+	com.sun.prism.d3d.D3DGraphics.<init>(D3DGraphics.java:42)
+TRACE 300580:
+	org.eclipse.collections.impl.set.mutable.UnifiedSet.add(UnifiedSet.java:244)
+	Simulation.addAabbOverlap(Simulation.java:59)
+	Simulation.advance(Simulation.java:105)
+	Test$1.handle(Test.java:75)
+TRACE 300622:
+	javafx.scene.canvas.GraphicsContext.setFill(GraphicsContext.java:1161)
+	Test$1.handle(Test.java:77)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300578:
+	Simulation.advance(Simulation.java:115)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300577:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put(IntObjectHashMap.java:2313)
+	Simulation.addAabbOverlap(Simulation.java:51)
+	Simulation.advance(Simulation.java:99)
+	Test$1.handle(Test.java:75)
+TRACE 300623:
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:154)
+	Simulation.advance(Simulation.java:75)
+TRACE 300575:
+	Test$1.handle(Test.java:78)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+TRACE 300574:
+	java.util.HashMap.hash(<Unknown Source>:Unknown line)
+	java.util.HashMap.containsKey(<Unknown Source>:Unknown line)
+	Simulation.addAabbOverlap(Simulation.java:48)
+	Simulation.advance(Simulation.java:105)
+TRACE 300573:
+	java.util.HashMap.remove(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:163)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+TRACE 300570:
+	javafx.scene.Scene$MouseHandler.process(Scene.java:3683)
+	javafx.scene.Scene$MouseHandler.access$1500(Scene.java:3485)
+	javafx.scene.Scene.impl_processMouseEvent(Scene.java:1762)
+	javafx.scene.Scene$ScenePeerListener.mouseEvent(Scene.java:2494)
+TRACE 300569:
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.getState(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.ReentrantLock$Sync.tryRelease(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.release(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.ReentrantLock.unlock(<Unknown Source>:Unknown line)
+TRACE 300624:
+	com.sun.prism.d3d.D3DShader.enable(D3DShader.java:Unknown line)
+	com.sun.prism.d3d.D3DShader.enable(D3DShader.java:64)
+	com.sun.prism.impl.ps.BaseShaderContext.checkState(BaseShaderContext.java:649)
+	com.sun.prism.impl.ps.BaseShaderContext.validateTextureOp(BaseShaderContext.java:583)
+TRACE 300625:
+	com.sun.prism.d3d.D3DResourceFactory.nGetTextureWidth(D3DResourceFactory.java:Unknown line)
+	com.sun.prism.d3d.D3DSwapChain.getPhysicalWidth(D3DSwapChain.java:90)
+	com.sun.prism.d3d.D3DContext.updateRenderTarget(D3DContext.java:216)
+	com.sun.prism.impl.ps.BaseShaderContext.setRenderTarget(BaseShaderContext.java:747)
+TRACE 300626:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.clear(IntHashSet.java:418)
+	SAP.sweep(SAP.java:136)
+	Simulation.advance(Simulation.java:76)
+	Test$1.handle(Test.java:75)
+TRACE 300627:
+	com.sun.prism.d3d.D3DContext.nResetTransform(D3DContext.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.updateShaderTransform(D3DContext.java:288)
+	com.sun.prism.impl.ps.BaseShaderContext.checkState(BaseShaderContext.java:662)
+	com.sun.prism.impl.ps.BaseShaderContext.validateTextureOp(BaseShaderContext.java:583)
+TRACE 300564:
+	com.sun.prism.impl.VertexBuffer.addMappedPgram(VertexBuffer.java:457)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedPgram(BaseShaderGraphics.java:903)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedRect(BaseShaderGraphics.java:601)
+	com.sun.prism.impl.ps.BaseShaderGraphics.fillEllipse(BaseShaderGraphics.java:1534)
+TRACE 300563:
+	com.sun.javafx.geom.transform.Affine3D.setTransform(Affine3D.java:157)
+	com.sun.prism.impl.BaseGraphics.setTransform(BaseGraphics.java:143)
+	com.sun.javafx.sg.prism.NGCanvas.renderStream(NGCanvas.java:1091)
+	com.sun.javafx.sg.prism.NGCanvas.renderContent(NGCanvas.java:606)
+TRACE 300562:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put(IntObjectHashMap.java:2303)
+	Simulation.addAabbOverlap(Simulation.java:51)
+	Simulation.advance(Simulation.java:99)
+	Test$1.handle(Test.java:75)
+TRACE 300628:
+	com.sun.prism.d3d.D3DContext.nSetRenderTarget(D3DContext.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.updateRenderTarget(D3DContext.java:207)
+	com.sun.prism.impl.ps.BaseShaderContext.setRenderTarget(BaseShaderContext.java:747)
+	com.sun.prism.impl.BaseContext.setRenderTarget(BaseContext.java:131)
+TRACE 300561:
+	java.lang.Float.intBitsToFloat(<Unknown Source>:Unknown line)
+	com.sun.javafx.sg.prism.GrowableDataBuffer.getFloat(GrowableDataBuffer.java:563)
+	com.sun.javafx.sg.prism.NGCanvas.handleRenderOp(NGCanvas.java:1225)
+	com.sun.javafx.sg.prism.NGCanvas.renderStream(NGCanvas.java:1097)
+TRACE 300629:
+	com.sun.prism.d3d.D3DContext.nSetProjViewMatrix(D3DContext.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.updateRenderTarget(D3DContext.java:235)
+	com.sun.prism.impl.ps.BaseShaderContext.setRenderTarget(BaseShaderContext.java:747)
+	com.sun.prism.impl.BaseContext.setRenderTarget(BaseContext.java:131)
+TRACE 300095:
+	java.lang.ClassLoader.findBootstrapClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.findBootstrapClassOrNull(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+TRACE 300558:
+	java.nio.DirectByteBuffer.<init>(<Unknown Source>:Unknown line)
+	java.nio.ByteBuffer.allocateDirect(<Unknown Source>:Unknown line)
+	com.sun.prism.d3d.D3DResourceFactory.getBuffer(D3DResourceFactory.java:374)
+	com.sun.prism.d3d.D3DResourceFactory.createShader(D3DResourceFactory.java:390)
+TRACE 300097:
+	java.lang.Class.getDeclaredMethods0(<Unknown Source>:Unknown line)
+	java.lang.Class.privateGetDeclaredMethods(<Unknown Source>:Unknown line)
+	java.lang.Class.privateGetMethodRecursive(<Unknown Source>:Unknown line)
+	java.lang.Class.getMethod0(<Unknown Source>:Unknown line)
+TRACE 300557:
+	com.sun.prism.d3d.D3DRTTexture.createGraphics(D3DRTTexture.java:77)
+	com.sun.prism.d3d.D3DResourceFactory.createRTTexture(D3DResourceFactory.java:316)
+	com.sun.prism.d3d.D3DResourceFactory.createPresentable(D3DResourceFactory.java:332)
+	com.sun.javafx.tk.quantum.PresentingPainter.run(PresentingPainter.java:80)
+TRACE 300556:
+	com.sun.prism.d3d.D3DResourceFactory.nCreateTexture(D3DResourceFactory.java:Unknown line)
+	com.sun.prism.d3d.D3DResourceFactory.createRTTexture(D3DResourceFactory.java:301)
+	com.sun.prism.d3d.D3DResourceFactory.createPresentable(D3DResourceFactory.java:332)
+	com.sun.javafx.tk.quantum.PresentingPainter.run(PresentingPainter.java:80)
+TRACE 300555:
+	java.util.concurrent.ThreadPoolExecutor.workerCountOf(<Unknown Source>:Unknown line)
+	java.util.concurrent.ThreadPoolExecutor.execute(<Unknown Source>:Unknown line)
+	java.util.concurrent.AbstractExecutorService.submit(<Unknown Source>:Unknown line)
+	com.sun.javafx.tk.quantum.QuantumRenderer.submitRenderJob(QuantumRenderer.java:218)
+TRACE 300554:
+	java.lang.Float.floatToRawIntBits(<Unknown Source>:Unknown line)
+	java.lang.Float.floatToIntBits(<Unknown Source>:Unknown line)
+	com.sun.javafx.sg.prism.GrowableDataBuffer.putFloat(GrowableDataBuffer.java:398)
+	javafx.scene.canvas.GraphicsContext.writeRectParams(GraphicsContext.java:681)
+TRACE 300649:
+	com.sun.javafx.text.GlyphLayout.addTextRun(GlyphLayout.java:139)
+	com.sun.javafx.text.GlyphLayout.breakRuns(GlyphLayout.java:312)
+	com.sun.javafx.text.PrismTextLayout.buildRuns(PrismTextLayout.java:770)
+	com.sun.javafx.text.PrismTextLayout.layout(PrismTextLayout.java:1021)
+TRACE 300650:
+	com.sun.prism.d3d.D3DContext.updateTexture(D3DContext.java:257)
+	com.sun.prism.impl.ps.BaseShaderContext.setTexture(BaseShaderContext.java:691)
+	com.sun.prism.impl.ps.BaseShaderContext.validatePaintOp(BaseShaderContext.java:480)
+	com.sun.prism.impl.ps.BaseShaderContext.validatePaintOp(BaseShaderContext.java:407)
+TRACE 300551:
+	SAP.sweep(SAP.java:142)
+	Simulation.advance(Simulation.java:76)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300550:
+	java.util.HashMap.resize(<Unknown Source>:Unknown line)
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:155)
+TRACE 300549:
+	java.util.HashMap.resize(<Unknown Source>:Unknown line)
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:154)
+TRACE 300548:
+	java.util.HashMap.resize(<Unknown Source>:Unknown line)
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.sweep(SAP.java:154)
+TRACE 300651:
+	com.sun.javafx.font.directwrite.OS.CreateWicBitmapRenderTarget(OS.java:Unknown line)
+	com.sun.javafx.font.directwrite.ID2D1Factory.CreateWicBitmapRenderTarget(ID2D1Factory.java:34)
+	com.sun.javafx.font.directwrite.DWGlyph.createRenderingTarget(DWGlyph.java:301)
+	com.sun.javafx.font.directwrite.DWGlyph.getCachedRenderingTarget(DWGlyph.java:280)
+TRACE 300652:
+	sun.misc.Unsafe.compareAndSwapObject(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.compareAndSetTail(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.enq(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.transferForSignal(<Unknown Source>:Unknown line)
+TRACE 300544:
+	sun.misc.Unsafe.unpark(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.LockSupport.unpark(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.unparkSuccessor(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer.doReleaseShared(<Unknown Source>:Unknown line)
+TRACE 300541:
+	com.sun.glass.ui.win.WinWindow._setBounds(WinWindow.java:Unknown line)
+	com.sun.glass.ui.Window.setBounds(Window.java:572)
+	com.sun.javafx.tk.quantum.WindowStage.setBounds(WindowStage.java:317)
+	javafx.stage.Window$TKBoundsConfigurator.apply(Window.java:1274)
+TRACE 300653:
+	com.sun.javafx.text.GlyphLayout.getInstance(GlyphLayout.java:391)
+	com.sun.javafx.text.PrismTextLayout.buildRuns(PrismTextLayout.java:769)
+	com.sun.javafx.text.PrismTextLayout.layout(PrismTextLayout.java:1021)
+	com.sun.javafx.text.PrismTextLayout.ensureLayout(PrismTextLayout.java:223)
+TRACE 300539:
+	javafx.scene.Scene.impl_initPeer(Scene.java:725)
+	javafx.stage.Window$9.invalidated(Window.java:844)
+	javafx.beans.property.BooleanPropertyBase.markInvalid(BooleanPropertyBase.java:109)
+	javafx.beans.property.BooleanPropertyBase.set(BooleanPropertyBase.java:144)
+TRACE 300655:
+	com.sun.prism.d3d.D3DContext.nSetTexture(D3DContext.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.updateTexture(D3DContext.java:281)
+	com.sun.prism.impl.ps.BaseShaderContext.setTexture(BaseShaderContext.java:691)
+	com.sun.prism.impl.ps.BaseShaderContext.validateTextureOp(BaseShaderContext.java:584)
+TRACE 300524:
+	java.util.zip.ZipFile.entries(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.access$001(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile$JarEntryIterator.<init>(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile$JarEntryIterator.<init>(<Unknown Source>:Unknown line)
+TRACE 300506:
+	Test.start(Test.java:63)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+	com.sun.javafx.application.LauncherImpl$$Lambda$55.441090407.run(<Unknown Source>:Unknown line)
+	com.sun.javafx.application.PlatformImpl.lambda$runAndWait$175(PlatformImpl.java:326)
+TRACE 300505:
+	Simulation.addAabbOverlap(Simulation.java:51)
+	Simulation.lambda$0(Simulation.java:41)
+	Simulation$$Lambda$70.437180575.value(<Unknown Source>:Unknown line)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each(IntHashSet.java:544)
+TRACE 300504:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each(IntHashSet.java:540)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.forEach(IntHashSet.java:523)
+	Simulation.<init>(Simulation.java:39)
+	Test.start(Test.java:51)
+TRACE 300503:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probe(IntHashSet.java:1011)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.contains(IntHashSet.java:517)
+	Simulation.lambda$0(Simulation.java:40)
+	Simulation$$Lambda$70.437180575.value(<Unknown Source>:Unknown line)
+TRACE 300016:
+	java.lang.String.toLowerCase(<Unknown Source>:Unknown line)
+	java.lang.String.toLowerCase(<Unknown Source>:Unknown line)
+	sun.usagetracker.UsageTrackerClient.getOSSpecificConfigFilePath(<Unknown Source>:Unknown line)
+	sun.usagetracker.UsageTrackerClient.getConfigFilePrivileged(<Unknown Source>:Unknown line)
+TRACE 300658:
+	com.sun.glass.ui.View.getWidth(View.java:482)
+	com.sun.prism.PresentableState.update(PresentableState.java:338)
+	com.sun.javafx.tk.quantum.SceneState.update(SceneState.java:103)
+	com.sun.javafx.tk.quantum.GlassScene.updateSceneState(GlassScene.java:282)
+TRACE 300500:
+	java.util.HashMap.getNode(<Unknown Source>:Unknown line)
+	java.util.HashMap.containsKey(<Unknown Source>:Unknown line)
+	Simulation.addAabbOverlap(Simulation.java:48)
+	Simulation.lambda$0(Simulation.java:41)
+TRACE 300499:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.containsValue(IntObjectHashMap.java:2344)
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains(IntObjectHashMap.java:513)
+	Simulation.addAabbOverlap(Simulation.java:47)
+	Simulation.lambda$0(Simulation.java:41)
+TRACE 300498:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.containsValue(IntObjectHashMap.java:2346)
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains(IntObjectHashMap.java:513)
+	Simulation.addAabbOverlap(Simulation.java:47)
+	Simulation.lambda$0(Simulation.java:41)
+TRACE 300496:
+	Simulation.<init>(Simulation.java:36)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+	com.sun.javafx.application.LauncherImpl$$Lambda$55.441090407.run(<Unknown Source>:Unknown line)
+TRACE 300495:
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.findClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+	java.lang.ClassLoader.loadClass(<Unknown Source>:Unknown line)
+TRACE 300494:
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probe(IntHashSet.java:1011)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.add(IntHashSet.java:223)
+	SAP.<init>(SAP.java:77)
+	Simulation.<init>(Simulation.java:34)
+TRACE 300659:
+	com.sun.prism.d3d.D3DContext.nSetBlendEnabled(D3DContext.java:Unknown line)
+	com.sun.prism.d3d.D3DContext.updateCompositeMode(D3DContext.java:348)
+	com.sun.prism.impl.ps.BaseShaderContext.checkState(BaseShaderContext.java:681)
+	com.sun.prism.impl.ps.BaseShaderContext.validateTextureOp(BaseShaderContext.java:583)
+TRACE 300492:
+	SAP.<init>(SAP.java:75)
+	Simulation.<init>(Simulation.java:34)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+TRACE 300491:
+	org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList.add(BooleanArrayList.java:245)
+	org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList.addAll(BooleanArrayList.java:267)
+	SAP.<init>(SAP.java:36)
+	Simulation.<init>(Simulation.java:34)
+TRACE 300490:
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.<init>(SAP.java:80)
+	Simulation.<init>(Simulation.java:31)
+TRACE 300489:
+	org.eclipse.collections.impl.SpreadFunctions.intSpreadTwo(SpreadFunctions.java:92)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.spreadTwoAndMask(IntHashSet.java:1070)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probeTwo(IntHashSet.java:1016)
+	org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probe(IntHashSet.java:1011)
+TRACE 300488:
+	SAP.<init>(SAP.java:70)
+	Simulation.<init>(Simulation.java:31)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+TRACE 300487:
+	java.util.HashMap.resize(<Unknown Source>:Unknown line)
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.<init>(SAP.java:80)
+TRACE 300661:
+	sun.misc.Unsafe.park(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.LockSupport.park(<Unknown Source>:Unknown line)
+	java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(<Unknown Source>:Unknown line)
+	java.util.concurrent.LinkedBlockingQueue.take(<Unknown Source>:Unknown line)
+TRACE 300663:
+	com.sun.prism.d3d.D3DGraphics.nClear(D3DGraphics.java:Unknown line)
+	com.sun.prism.d3d.D3DGraphics.clear(D3DGraphics.java:88)
+	com.sun.javafx.tk.quantum.ViewPainter.doPaint(ViewPainter.java:465)
+	com.sun.javafx.tk.quantum.ViewPainter.paintImpl(ViewPainter.java:330)
+TRACE 300484:
+	SAP.<init>(SAP.java:74)
+	Simulation.<init>(Simulation.java:31)
+	Test.start(Test.java:51)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+TRACE 300664:
+	javafx.scene.input.MouseEvent$Flags.<init>(MouseEvent.java:928)
+	javafx.scene.input.MouseEvent$Flags.<init>(MouseEvent.java:923)
+	javafx.scene.input.MouseEvent.<init>(MouseEvent.java:442)
+	javafx.scene.input.MouseEvent.<init>(MouseEvent.java:339)
+TRACE 300482:
+	java.util.HashMap.resize(<Unknown Source>:Unknown line)
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	SAP.<init>(SAP.java:79)
+TRACE 300481:
+	java.lang.Integer.hashCode(<Unknown Source>:Unknown line)
+	java.lang.Integer.hashCode(<Unknown Source>:Unknown line)
+	java.util.HashMap.hash(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+TRACE 300665:
+	SAP.sweep(SAP.java:155)
+	Simulation.advance(Simulation.java:75)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+TRACE 300666:
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedPgram(BaseShaderGraphics.java:903)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedRect(BaseShaderGraphics.java:601)
+	com.sun.prism.impl.ps.BaseShaderGraphics.fillEllipse(BaseShaderGraphics.java:1534)
+	com.sun.javafx.sg.prism.NGCanvas.handleRenderOp(NGCanvas.java:1240)
+TRACE 300479:
+	java.lang.System.arraycopy(<Unknown Source>:Unknown line)
+	java.util.TimSort.mergeLo(<Unknown Source>:Unknown line)
+	java.util.TimSort.mergeAt(<Unknown Source>:Unknown line)
+	java.util.TimSort.mergeCollapse(<Unknown Source>:Unknown line)
+TRACE 300473:
+	java.util.stream.Nodes.<clinit>(<Unknown Source>:Unknown line)
+	java.util.stream.ReferencePipeline.makeNodeBuilder(<Unknown Source>:Unknown line)
+	java.util.stream.AbstractPipeline.evaluate(<Unknown Source>:Unknown line)
+	java.util.stream.AbstractPipeline.evaluateToArrayNode(<Unknown Source>:Unknown line)
+TRACE 300460:
+	org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList.add(BooleanArrayList.java:245)
+	org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList.addAll(BooleanArrayList.java:267)
+	SAP.<init>(SAP.java:36)
+	Simulation.<init>(Simulation.java:31)
+TRACE 300667:
+	Simulation.advance(Simulation.java:102)
+	Test$1.handle(Test.java:75)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver.lambda$handle$484(AnimationTimer.java:57)
+	javafx.animation.AnimationTimer$AnimationTimerReceiver$$Lambda$95.220113194.run(<Unknown Source>:Unknown line)
+TRACE 300446:
+	java.util.HashMap$EntryIterator.next(<Unknown Source>:Unknown line)
+	sun.security.util.SignatureFileVerifier.processImpl(<Unknown Source>:Unknown line)
+	sun.security.util.SignatureFileVerifier.process(<Unknown Source>:Unknown line)
+	java.util.jar.JarVerifier.processEntry(<Unknown Source>:Unknown line)
+TRACE 300445:
+	java.util.jar.Manifest.read(<Unknown Source>:Unknown line)
+	sun.security.util.SignatureFileVerifier.processImpl(<Unknown Source>:Unknown line)
+	sun.security.util.SignatureFileVerifier.process(<Unknown Source>:Unknown line)
+	java.util.jar.JarVerifier.processEntry(<Unknown Source>:Unknown line)
+TRACE 300444:
+	sun.security.util.ManifestDigester.findSection(<Unknown Source>:Unknown line)
+	sun.security.util.ManifestDigester.<init>(<Unknown Source>:Unknown line)
+	java.util.jar.JarVerifier.processEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarVerifier.update(<Unknown Source>:Unknown line)
+TRACE 300443:
+	java.util.zip.Inflater.inflateBytes(<Unknown Source>:Unknown line)
+	java.util.zip.Inflater.inflate(<Unknown Source>:Unknown line)
+	java.util.zip.InflaterInputStream.read(<Unknown Source>:Unknown line)
+	sun.misc.IOUtils.readFully(<Unknown Source>:Unknown line)
+TRACE 300442:
+	java.util.jar.Manifest.read(<Unknown Source>:Unknown line)
+	java.util.jar.Manifest.<init>(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getManifestFromReference(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getManifest(<Unknown Source>:Unknown line)
+TRACE 300441:
+	java.lang.String.intern(<Unknown Source>:Unknown line)
+	java.util.jar.Attributes$Name.<init>(<Unknown Source>:Unknown line)
+	java.util.jar.Attributes.putValue(<Unknown Source>:Unknown line)
+	java.util.jar.Attributes.read(<Unknown Source>:Unknown line)
+TRACE 300438:
+	java.util.HashMap$HashIterator.nextNode(<Unknown Source>:Unknown line)
+	java.util.HashMap$EntryIterator.next(<Unknown Source>:Unknown line)
+	java.util.HashMap$EntryIterator.next(<Unknown Source>:Unknown line)
+	sun.security.util.SignatureFileVerifier.processImpl(<Unknown Source>:Unknown line)
+TRACE 300154:
+	java.lang.Object.hashCode(<Unknown Source>:Unknown line)
+	java.lang.invoke.MethodType.hashCode(<Unknown Source>:Unknown line)
+	java.lang.invoke.MethodType$ConcurrentWeakInternSet$WeakEntry.<init>(<Unknown Source>:Unknown line)
+	java.lang.invoke.MethodType$ConcurrentWeakInternSet.get(<Unknown Source>:Unknown line)
+TRACE 300669:
+	com.sun.javafx.font.PrismFont.equals(PrismFont.java:90)
+	com.sun.javafx.sg.prism.NGText.setFont(NGText.java:66)
+	com.sun.javafx.sg.prism.NGCanvas.handleRenderOp(NGCanvas.java:1430)
+	com.sun.javafx.sg.prism.NGCanvas.renderStream(NGCanvas.java:1097)
+TRACE 300156:
+	java.lang.Class.isArray(<Unknown Source>:Unknown line)
+	sun.invoke.util.VerifyAccess.isTypeVisible(<Unknown Source>:Unknown line)
+	sun.invoke.util.VerifyAccess.isTypeVisible(<Unknown Source>:Unknown line)
+	java.lang.invoke.MemberName.checkForTypeAlias(<Unknown Source>:Unknown line)
+TRACE 300426:
+	java.math.BigInteger.implMulAdd(<Unknown Source>:Unknown line)
+	java.math.BigInteger.mulAdd(<Unknown Source>:Unknown line)
+	java.math.BigInteger.montReduce(<Unknown Source>:Unknown line)
+	java.math.BigInteger.implMontgomerySquare(<Unknown Source>:Unknown line)
+TRACE 300394:
+	java.util.Collections.unmodifiableSet(<Unknown Source>:Unknown line)
+	sun.security.pkcs.SignerInfo.<clinit>(<Unknown Source>:Unknown line)
+	sun.security.pkcs.PKCS7.parseSignedData(<Unknown Source>:Unknown line)
+	sun.security.pkcs.PKCS7.parse(<Unknown Source>:Unknown line)
+TRACE 300364:
+	java.security.Provider.getTypeAndAlgorithm(<Unknown Source>:Unknown line)
+	java.security.Provider.parseLegacyPut(<Unknown Source>:Unknown line)
+	java.security.Provider.ensureLegacyParsed(<Unknown Source>:Unknown line)
+	java.security.Provider.getService(<Unknown Source>:Unknown line)
+TRACE 300336:
+	java.lang.Class.forName0(<Unknown Source>:Unknown line)
+	java.lang.Class.forName(<Unknown Source>:Unknown line)
+	java.security.Provider$Service.getImplClass(<Unknown Source>:Unknown line)
+	java.security.Provider$Service.newInstance(<Unknown Source>:Unknown line)
+TRACE 300321:
+	sun.security.pkcs.PKCS7.parseSignedData(<Unknown Source>:Unknown line)
+	sun.security.pkcs.PKCS7.parse(<Unknown Source>:Unknown line)
+	sun.security.pkcs.PKCS7.parse(<Unknown Source>:Unknown line)
+	sun.security.pkcs.PKCS7.<init>(<Unknown Source>:Unknown line)
+TRACE 300297:
+	sun.security.util.ManifestDigester.<init>(<Unknown Source>:Unknown line)
+	java.util.jar.JarVerifier.processEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarVerifier.update(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.initializeVerifier(<Unknown Source>:Unknown line)
+TRACE 300264:
+	java.util.jar.JarFile.initializeVerifier(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getInputStream(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath$JarLoader$2.getInputStream(<Unknown Source>:Unknown line)
+	sun.misc.Resource.cachedInputStream(<Unknown Source>:Unknown line)
+TRACE 300258:
+	java.util.HashMap.resize(<Unknown Source>:Unknown line)
+	java.util.HashMap.putVal(<Unknown Source>:Unknown line)
+	java.util.HashMap.put(<Unknown Source>:Unknown line)
+	java.util.jar.Attributes.put(<Unknown Source>:Unknown line)
+TRACE 300257:
+	java.util.Random.next(<Unknown Source>:Unknown line)
+	java.util.Random.nextDouble(<Unknown Source>:Unknown line)
+	java.lang.Math.random(<Unknown Source>:Unknown line)
+	Test.start(Test.java:44)
+TRACE 300252:
+	javafx.scene.CssStyleHelper.createStyleHelper(CssStyleHelper.java:111)
+	javafx.scene.Node.reapplyCss(Node.java:8985)
+	javafx.scene.Node.impl_reapplyCSS(Node.java:8948)
+	javafx.scene.Node.invalidatedScenes(Node.java:856)
+TRACE 300249:
+	sun.util.logging.PlatformLogger$DefaultLoggerProxy.<init>(<Unknown Source>:Unknown line)
+	sun.util.logging.PlatformLogger.<init>(<Unknown Source>:Unknown line)
+	sun.util.logging.PlatformLogger.getLogger(<Unknown Source>:Unknown line)
+	com.sun.javafx.util.Logging.getCSSLogger(Logging.java:98)
+TRACE 300168:
+	java.lang.invoke.LambdaFormEditor.bindArgumentForm(<Unknown Source>:Unknown line)
+	java.lang.invoke.LambdaFormEditor.bindArgumentL(<Unknown Source>:Unknown line)
+	java.lang.invoke.BoundMethodHandle.bindArgumentL(<Unknown Source>:Unknown line)
+	java.lang.invoke.MethodHandle.bindArgumentL(<Unknown Source>:Unknown line)
+TRACE 300237:
+	com.sun.javafx.collections.ListListenerHelper$SingleChange.addListener(ListListenerHelper.java:153)
+	com.sun.javafx.collections.ListListenerHelper.addListener(ListListenerHelper.java:60)
+	javafx.collections.ObservableListBase.addListener(ObservableListBase.java:220)
+	com.sun.javafx.collections.VetoableListDecorator.<init>(VetoableListDecorator.java:75)
+TRACE 300236:
+	javafx.scene.Node.<clinit>(Node.java:5532)
+	Test.start(Test.java:30)
+	com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$162(LauncherImpl.java:863)
+	com.sun.javafx.application.LauncherImpl$$Lambda$55.441090407.run(<Unknown Source>:Unknown line)
+TRACE 300235:
+	java.util.zip.ZipFile.getEntryTime(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile.getZipEntry(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile.getEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getEntry(<Unknown Source>:Unknown line)
+TRACE 300670:
+	java.lang.Integer.valueOf(<Unknown Source>:Unknown line)
+	Simulation.addAabbOverlap(Simulation.java:55)
+	Simulation.advance(Simulation.java:105)
+	Test$1.handle(Test.java:75)
+TRACE 300671:
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.probe(IntObjectHashMap.java:3079)
+	org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put(IntObjectHashMap.java:2303)
+	Simulation.addAabbOverlap(Simulation.java:51)
+	Simulation.advance(Simulation.java:99)
+TRACE 300232:
+	java.lang.System.nanoTime(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.defineClass(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader.access$100(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader$1.run(<Unknown Source>:Unknown line)
+TRACE 300230:
+	java.lang.Object.hashCode(<Unknown Source>:Unknown line)
+	java.util.Arrays.hashCode(<Unknown Source>:Unknown line)
+	java.util.Objects.hash(<Unknown Source>:Unknown line)
+	java.lang.invoke.MemberName.hashCode(<Unknown Source>:Unknown line)
+TRACE 300565:
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedPgram(BaseShaderGraphics.java:616)
+	com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedRect(BaseShaderGraphics.java:601)
+	com.sun.prism.impl.ps.BaseShaderGraphics.fillEllipse(BaseShaderGraphics.java:1534)
+	com.sun.javafx.sg.prism.NGCanvas.handleRenderOp(NGCanvas.java:1240)
+TRACE 300221:
+	java.lang.Class.isArray(<Unknown Source>:Unknown line)
+	java.lang.invoke.InvokerBytecodeGenerator.isStaticallyNameable(<Unknown Source>:Unknown line)
+	java.lang.invoke.InvokerBytecodeGenerator.isStaticallyInvocable(<Unknown Source>:Unknown line)
+	java.lang.invoke.InvokerBytecodeGenerator.generateCustomizedCodeBytes(<Unknown Source>:Unknown line)
+TRACE 300220:
+	java.util.zip.ZipFile.getEntryCSize(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile.getZipEntry(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile.getEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getEntry(<Unknown Source>:Unknown line)
+TRACE 300219:
+	com.sun.prism.d3d.D3DPipeline.nInit(D3DPipeline.java:Unknown line)
+	com.sun.prism.d3d.D3DPipeline.lambda$static$453(D3DPipeline.java:52)
+	com.sun.prism.d3d.D3DPipeline$$Lambda$26.1439914523.run(<Unknown Source>:Unknown line)
+	java.security.AccessController.doPrivileged(<Unknown Source>:Unknown line)
+TRACE 300180:
+	sun.misc.Unsafe.defineAnonymousClass(<Unknown Source>:Unknown line)
+	java.lang.invoke.InnerClassLambdaMetafactory.spinInnerClass(<Unknown Source>:Unknown line)
+	java.lang.invoke.InnerClassLambdaMetafactory.buildCallSite(<Unknown Source>:Unknown line)
+	java.lang.invoke.LambdaMetafactory.metafactory(<Unknown Source>:Unknown line)
+TRACE 300675:
+	com.sun.glass.ui.win.WinApplication._terminateLoop(WinApplication.java:Unknown line)
+	com.sun.glass.ui.win.WinApplication.finishTerminating(WinApplication.java:200)
+	com.sun.glass.ui.Application.terminate(Application.java:398)
+	com.sun.javafx.tk.quantum.QuantumToolkit.lambda$exit$406(QuantumToolkit.java:762)
+TRACE 300200:
+	jdk.internal.org.objectweb.asm.MethodWriter.visitMethodInsn(<Unknown Source>:Unknown line)
+	jdk.internal.org.objectweb.asm.MethodVisitor.visitMethodInsn(<Unknown Source>:Unknown line)
+	java.lang.invoke.InnerClassLambdaMetafactory$ForwardingMethodGenerator.generate(<Unknown Source>:Unknown line)
+	java.lang.invoke.InnerClassLambdaMetafactory.spinInnerClass(<Unknown Source>:Unknown line)
+TRACE 300192:
+	java.util.zip.ZipCoder.getBytes(<Unknown Source>:Unknown line)
+	java.util.zip.ZipFile.getEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getEntry(<Unknown Source>:Unknown line)
+	java.util.jar.JarFile.getJarEntry(<Unknown Source>:Unknown line)
+TRACE 300187:
+	sun.misc.URLClassPath$JarLoader.findResource(<Unknown Source>:Unknown line)
+	sun.misc.URLClassPath.findResource(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader$2.run(<Unknown Source>:Unknown line)
+	java.net.URLClassLoader$2.run(<Unknown Source>:Unknown line)
+TRACE 300672:
+	com.sun.javafx.tk.quantum.WindowStage.setScene(WindowStage.java:273)
+	javafx.stage.Window$9.invalidated(Window.java:878)
+	javafx.beans.property.BooleanPropertyBase.markInvalid(BooleanPropertyBase.java:109)
+	javafx.beans.property.BooleanPropertyBase.set(BooleanPropertyBase.java:144)
+CPU SAMPLES BEGIN (total = 2937) Sun Jun 10 10:58:11 2018
+rank   self  accum   count trace method
+   1 27.61% 27.61%     811 300591 Simulation.advance
+   2 19.54% 47.16%     574 300592 Simulation.advance
+   3  7.59% 54.75%     223 300501 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains
+   4  6.78% 61.53%     199 300552 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains
+   5  6.37% 67.89%     187 300553 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.contains
+   6  5.99% 73.88%     176 300595 org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd
+   7  4.60% 78.48%     135 300590 java.util.HashMap.getNode
+   8  3.40% 81.89%     100 300615 org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd
+   9  2.69% 84.58%      79 300233 com.sun.glass.ui.win.WinApplication._runLoop
+  10  2.62% 87.20%      77 300617 org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd
+  11  1.70% 88.90%      50 300599 java.util.HashMap.getNode
+  12  0.65% 89.55%      19 300092 java.lang.ClassLoader.defineClass1
+  13  0.48% 90.02%      14 300588 Simulation.advance
+  14  0.37% 90.40%      11 300596 java.util.HashMap.remove
+  15  0.34% 90.74%      10 300579 SAP.sweep
+  16  0.31% 91.05%       9 300656 com.sun.prism.impl.ps.BaseShaderContext.validatePaintOp
+  17  0.31% 91.35%       9 300604 Simulation.advance
+  18  0.27% 91.62%       8 300613 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each
+  19  0.24% 91.86%       7 300614 java.util.HashMap.remove
+  20  0.24% 92.10%       7 300567 com.sun.prism.d3d.D3DSwapChain.nPresent
+  21  0.20% 92.31%       6 300581 java.util.HashMap.hash
+  22  0.17% 92.48%       5 300582 Simulation.advance
+  23  0.14% 92.61%       4 300431 sun.security.provider.DigestBase.implCompressMultiBlock
+  24  0.14% 92.75%       4 300566 com.sun.prism.d3d.D3DContext.nDrawIndexedQuads
+  25  0.14% 92.88%       4 300606 org.eclipse.collections.impl.SpreadFunctions.intSpreadTwo
+  26  0.14% 93.02%       4 300583 SAP.sweep
+  27  0.14% 93.16%       4 300560 com.sun.prism.d3d.D3DContext.nDrawIndexedQuads
+  28  0.10% 93.26%       3 300597 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each
+  29  0.10% 93.36%       3 300610 Simulation.addAabbOverlap
+  30  0.10% 93.46%       3 300209 java.util.zip.ZipFile.read
+  31  0.10% 93.56%       3 300533 com.sun.glass.ui.win.WinWindow._createWindow
+  32  0.10% 93.67%       3 300619 com.sun.prism.impl.ps.BaseShaderContext.validatePaintOp
+  33  0.10% 93.77%       3 300654 SAP.sweep
+  34  0.10% 93.87%       3 300142 sun.misc.Unsafe.defineAnonymousClass
+  35  0.10% 93.97%       3 300593 org.eclipse.collections.impl.set.mutable.UnifiedSet$ChainedBucket.<init>
+  36  0.10% 94.08%       3 300594 Simulation.advance
+  37  0.07% 94.14%       2 300576 Test$1.handle
+  38  0.07% 94.21%       2 300568 SAP.sweep
+  39  0.07% 94.28%       2 300229 com.sun.prism.d3d.D3DResourceFactory.nGetContext
+  40  0.07% 94.35%       2 300616 SAP.sweep
+  41  0.07% 94.42%       2 300630 java.util.HashMap.hash
+  42  0.07% 94.48%       2 300547 SAP.updateBounds
+  43  0.07% 94.55%       2 300545 com.sun.glass.ui.win.WinApplication._submitForLaterInvocation
+  44  0.07% 94.62%       2 300540 com.sun.glass.ui.win.WinWindow._requestFocus
+  45  0.07% 94.69%       2 300611 Test$1.handle
+  46  0.07% 94.76%       2 300502 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each
+  47  0.07% 94.82%       2 300586 java.util.HashMap.removeNode
+  48  0.07% 94.89%       2 300657 javafx.scene.canvas.GraphicsContext.setFill
+  49  0.07% 94.96%       2 300493 SAP.<init>
+  50  0.07% 95.03%       2 300660 org.eclipse.collections.impl.set.mutable.UnifiedSet.removeFromChain
+  51  0.07% 95.10%       2 300486 SAP.<init>
+  52  0.07% 95.17%       2 300602 Simulation.advance
+  53  0.07% 95.23%       2 300662 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probe
+  54  0.07% 95.30%       2 300485 SAP.<init>
+  55  0.07% 95.37%       2 300483 SAP.<init>
+  56  0.07% 95.44%       2 300480 java.util.zip.Inflater.inflateBytes
+  57  0.07% 95.51%       2 300459 java.net.URLClassLoader.findClass
+  58  0.07% 95.57%       2 300668 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.probe
+  59  0.07% 95.64%       2 300234 java.util.zip.ZipFile.getEntry
+  60  0.07% 95.71%       2 300620 SAP.sweep
+  61  0.03% 95.74%       1 300598 com.sun.prism.d3d.D3DResourceFactory.nTestCooperativeLevel
+  62  0.03% 95.78%       1 300600 javafx.scene.Parent.updateBounds
+  63  0.03% 95.81%       1 300062 sun.misc.URLClassPath$JarLoader$1.run
+  64  0.03% 95.85%       1 300601 java.lang.Thread.isInterrupted
+  65  0.03% 95.88%       1 300603 org.eclipse.collections.impl.set.mutable.UnifiedSet$ChainedBucket.access$302
+  66  0.03% 95.91%       1 300589 org.eclipse.collections.impl.set.mutable.UnifiedSet.removeDeepChain
+  67  0.03% 95.95%       1 300605 java.io.FileOutputStream.writeBytes
+  68  0.03% 95.98%       1 300587 java.util.concurrent.locks.AbstractQueuedSynchronizer.release
+  69  0.03% 96.02%       1 300607 Simulation.addAabbOverlap
+  70  0.03% 96.05%       1 300585 Simulation.advance
+  71  0.03% 96.08%       1 300584 SAP.sweep
+  72  0.03% 96.12%       1 300071 java.util.jar.JarFile.match
+  73  0.03% 96.15%       1 300612 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put
+  74  0.03% 96.19%       1 300618 org.eclipse.collections.impl.set.mutable.UnifiedSet.chainedAdd
+  75  0.03% 96.22%       1 300621 com.sun.javafx.geom.transform.Affine3D.<init>
+  76  0.03% 96.25%       1 300580 org.eclipse.collections.impl.set.mutable.UnifiedSet.add
+  77  0.03% 96.29%       1 300622 javafx.scene.canvas.GraphicsContext.setFill
+  78  0.03% 96.32%       1 300578 Simulation.advance
+  79  0.03% 96.36%       1 300577 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put
+  80  0.03% 96.39%       1 300623 java.util.HashMap.putVal
+  81  0.03% 96.42%       1 300575 Test$1.handle
+  82  0.03% 96.46%       1 300574 java.util.HashMap.hash
+  83  0.03% 96.49%       1 300573 java.util.HashMap.remove
+  84  0.03% 96.53%       1 300570 javafx.scene.Scene$MouseHandler.process
+  85  0.03% 96.56%       1 300569 java.util.concurrent.locks.AbstractQueuedSynchronizer.getState
+  86  0.03% 96.60%       1 300624 com.sun.prism.d3d.D3DShader.enable
+  87  0.03% 96.63%       1 300625 com.sun.prism.d3d.D3DResourceFactory.nGetTextureWidth
+  88  0.03% 96.66%       1 300626 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.clear
+  89  0.03% 96.70%       1 300627 com.sun.prism.d3d.D3DContext.nResetTransform
+  90  0.03% 96.73%       1 300564 com.sun.prism.impl.VertexBuffer.addMappedPgram
+  91  0.03% 96.77%       1 300563 com.sun.javafx.geom.transform.Affine3D.setTransform
+  92  0.03% 96.80%       1 300562 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.put
+  93  0.03% 96.83%       1 300628 com.sun.prism.d3d.D3DContext.nSetRenderTarget
+  94  0.03% 96.87%       1 300561 java.lang.Float.intBitsToFloat
+  95  0.03% 96.90%       1 300629 com.sun.prism.d3d.D3DContext.nSetProjViewMatrix
+  96  0.03% 96.94%       1 300095 java.lang.ClassLoader.findBootstrapClass
+  97  0.03% 96.97%       1 300558 java.nio.DirectByteBuffer.<init>
+  98  0.03% 97.00%       1 300097 java.lang.Class.getDeclaredMethods0
+  99  0.03% 97.04%       1 300557 com.sun.prism.d3d.D3DRTTexture.createGraphics
+ 100  0.03% 97.07%       1 300556 com.sun.prism.d3d.D3DResourceFactory.nCreateTexture
+ 101  0.03% 97.11%       1 300555 java.util.concurrent.ThreadPoolExecutor.workerCountOf
+ 102  0.03% 97.14%       1 300554 java.lang.Float.floatToRawIntBits
+ 103  0.03% 97.17%       1 300649 com.sun.javafx.text.GlyphLayout.addTextRun
+ 104  0.03% 97.21%       1 300650 com.sun.prism.d3d.D3DContext.updateTexture
+ 105  0.03% 97.24%       1 300551 SAP.sweep
+ 106  0.03% 97.28%       1 300550 java.util.HashMap.resize
+ 107  0.03% 97.31%       1 300549 java.util.HashMap.resize
+ 108  0.03% 97.34%       1 300548 java.util.HashMap.resize
+ 109  0.03% 97.38%       1 300651 com.sun.javafx.font.directwrite.OS.CreateWicBitmapRenderTarget
+ 110  0.03% 97.41%       1 300652 sun.misc.Unsafe.compareAndSwapObject
+ 111  0.03% 97.45%       1 300544 sun.misc.Unsafe.unpark
+ 112  0.03% 97.48%       1 300541 com.sun.glass.ui.win.WinWindow._setBounds
+ 113  0.03% 97.51%       1 300653 com.sun.javafx.text.GlyphLayout.getInstance
+ 114  0.03% 97.55%       1 300539 javafx.scene.Scene.impl_initPeer
+ 115  0.03% 97.58%       1 300655 com.sun.prism.d3d.D3DContext.nSetTexture
+ 116  0.03% 97.62%       1 300524 java.util.zip.ZipFile.entries
+ 117  0.03% 97.65%       1 300506 Test.start
+ 118  0.03% 97.68%       1 300505 Simulation.addAabbOverlap
+ 119  0.03% 97.72%       1 300504 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.each
+ 120  0.03% 97.75%       1 300503 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probe
+ 121  0.03% 97.79%       1 300016 java.lang.String.toLowerCase
+ 122  0.03% 97.82%       1 300658 com.sun.glass.ui.View.getWidth
+ 123  0.03% 97.85%       1 300500 java.util.HashMap.getNode
+ 124  0.03% 97.89%       1 300499 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.containsValue
+ 125  0.03% 97.92%       1 300498 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.containsValue
+ 126  0.03% 97.96%       1 300496 Simulation.<init>
+ 127  0.03% 97.99%       1 300495 java.security.AccessController.doPrivileged
+ 128  0.03% 98.03%       1 300494 org.eclipse.collections.impl.set.mutable.primitive.IntHashSet.probe
+ 129  0.03% 98.06%       1 300659 com.sun.prism.d3d.D3DContext.nSetBlendEnabled
+ 130  0.03% 98.09%       1 300492 SAP.<init>
+ 131  0.03% 98.13%       1 300491 org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList.add
+ 132  0.03% 98.16%       1 300490 java.util.HashMap.putVal
+ 133  0.03% 98.20%       1 300489 org.eclipse.collections.impl.SpreadFunctions.intSpreadTwo
+ 134  0.03% 98.23%       1 300488 SAP.<init>
+ 135  0.03% 98.26%       1 300487 java.util.HashMap.resize
+ 136  0.03% 98.30%       1 300661 sun.misc.Unsafe.park
+ 137  0.03% 98.33%       1 300663 com.sun.prism.d3d.D3DGraphics.nClear
+ 138  0.03% 98.37%       1 300484 SAP.<init>
+ 139  0.03% 98.40%       1 300664 javafx.scene.input.MouseEvent$Flags.<init>
+ 140  0.03% 98.43%       1 300482 java.util.HashMap.resize
+ 141  0.03% 98.47%       1 300481 java.lang.Integer.hashCode
+ 142  0.03% 98.50%       1 300665 SAP.sweep
+ 143  0.03% 98.54%       1 300666 com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedPgram
+ 144  0.03% 98.57%       1 300479 java.lang.System.arraycopy
+ 145  0.03% 98.60%       1 300473 java.util.stream.Nodes.<clinit>
+ 146  0.03% 98.64%       1 300460 org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList.add
+ 147  0.03% 98.67%       1 300667 Simulation.advance
+ 148  0.03% 98.71%       1 300446 java.util.HashMap$EntryIterator.next
+ 149  0.03% 98.74%       1 300445 java.util.jar.Manifest.read
+ 150  0.03% 98.77%       1 300444 sun.security.util.ManifestDigester.findSection
+ 151  0.03% 98.81%       1 300443 java.util.zip.Inflater.inflateBytes
+ 152  0.03% 98.84%       1 300442 java.util.jar.Manifest.read
+ 153  0.03% 98.88%       1 300441 java.lang.String.intern
+ 154  0.03% 98.91%       1 300438 java.util.HashMap$HashIterator.nextNode
+ 155  0.03% 98.94%       1 300154 java.lang.Object.hashCode
+ 156  0.03% 98.98%       1 300669 com.sun.javafx.font.PrismFont.equals
+ 157  0.03% 99.01%       1 300156 java.lang.Class.isArray
+ 158  0.03% 99.05%       1 300426 java.math.BigInteger.implMulAdd
+ 159  0.03% 99.08%       1 300394 java.util.Collections.unmodifiableSet
+ 160  0.03% 99.11%       1 300364 java.security.Provider.getTypeAndAlgorithm
+ 161  0.03% 99.15%       1 300336 java.lang.Class.forName0
+ 162  0.03% 99.18%       1 300321 sun.security.pkcs.PKCS7.parseSignedData
+ 163  0.03% 99.22%       1 300297 sun.security.util.ManifestDigester.<init>
+ 164  0.03% 99.25%       1 300264 java.util.jar.JarFile.initializeVerifier
+ 165  0.03% 99.28%       1 300258 java.util.HashMap.resize
+ 166  0.03% 99.32%       1 300257 java.util.Random.next
+ 167  0.03% 99.35%       1 300252 javafx.scene.CssStyleHelper.createStyleHelper
+ 168  0.03% 99.39%       1 300249 sun.util.logging.PlatformLogger$DefaultLoggerProxy.<init>
+ 169  0.03% 99.42%       1 300168 java.lang.invoke.LambdaFormEditor.bindArgumentForm
+ 170  0.03% 99.46%       1 300237 com.sun.javafx.collections.ListListenerHelper$SingleChange.addListener
+ 171  0.03% 99.49%       1 300236 javafx.scene.Node.<clinit>
+ 172  0.03% 99.52%       1 300235 java.util.zip.ZipFile.getEntryTime
+ 173  0.03% 99.56%       1 300670 java.lang.Integer.valueOf
+ 174  0.03% 99.59%       1 300671 org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap.probe
+ 175  0.03% 99.63%       1 300232 java.lang.System.nanoTime
+ 176  0.03% 99.66%       1 300230 java.lang.Object.hashCode
+ 177  0.03% 99.69%       1 300565 com.sun.prism.impl.ps.BaseShaderGraphics.renderGeneralRoundedPgram
+ 178  0.03% 99.73%       1 300221 java.lang.Class.isArray
+ 179  0.03% 99.76%       1 300220 java.util.zip.ZipFile.getEntryCSize
+ 180  0.03% 99.80%       1 300219 com.sun.prism.d3d.D3DPipeline.nInit
+ 181  0.03% 99.83%       1 300180 sun.misc.Unsafe.defineAnonymousClass
+ 182  0.03% 99.86%       1 300675 com.sun.glass.ui.win.WinApplication._terminateLoop
+ 183  0.03% 99.90%       1 300200 jdk.internal.org.objectweb.asm.MethodWriter.visitMethodInsn
+ 184  0.03% 99.93%       1 300192 java.util.zip.ZipCoder.getBytes
+ 185  0.03% 99.97%       1 300187 sun.misc.URLClassPath$JarLoader.findResource
+ 186  0.03% 100.00%       1 300672 com.sun.javafx.tk.quantum.WindowStage.setScene
+CPU SAMPLES END

@@ -2,43 +2,43 @@ import java.util.Arrays;
 
 public class DiscBodyPair {
 	
-	private final int minBodyIndex, maxBodyIndex;
+	private final int bodyIndexA, bodyIndexB;
+	private final int hashCode;
 	
-	public DiscBodyPair(int minBodyIndex, int maxBodyIndex) {
-		this.minBodyIndex = minBodyIndex;
-		this.maxBodyIndex = maxBodyIndex;
+	public DiscBodyPair(int bodyIndexA, int bodyIndexB) {
+		this.bodyIndexA = bodyIndexA;
+		this.bodyIndexB = bodyIndexB;
+		this.hashCode = hashCode(bodyIndexA, bodyIndexB);
 	}
 
-	public int getMinBodyIndex() {
-		return minBodyIndex;
+	public int getBodyIndexA() {
+		return bodyIndexA;
 	}
 
-	public int getMaxBodyIndex() {
-		return maxBodyIndex;
+	public int getBodyIndexB() {
+		return bodyIndexB;
+	}
+	
+	@Override
+	public int hashCode() {
+		return hashCode;
 	}
 	
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof DiscBodyPair)
-			return equals((DiscBodyPair) o);
+			return hashCode == o.hashCode();
 		else
 			return false;
 	}
 	
-	private boolean equals(DiscBodyPair other) {
-		return (minBodyIndex == other.minBodyIndex
-				&& maxBodyIndex == other.maxBodyIndex);
-	}
-	
-	@Override
-	public int hashCode() {
-		return (minBodyIndex * maxBodyIndex 
-				+ minBodyIndex + maxBodyIndex);
+	public static int hashCode(int bodyIndexA, int bodyIndexB) {
+		return bodyIndexA * bodyIndexB + bodyIndexA + bodyIndexB;
 	}
 	
 	@Override
 	public String toString() {
-		return Arrays.toString(new int[]{minBodyIndex, maxBodyIndex});
+		return Arrays.toString(new int[]{bodyIndexA,bodyIndexB});
 	}
 	
 }
