@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.stream.IntStream;
+
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class Simulation implements Iterable<DiscBody> {
@@ -14,8 +16,8 @@ public class Simulation implements Iterable<DiscBody> {
 		
 		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
 				
-		sapAxisX = 1280;
-		sapAxisY = 720;
+		sapAxisX = 1280-280;
+		sapAxisY = 720+280;
 		
 		double axisSize = Math.sqrt(sapAxisX*sapAxisX + sapAxisY*sapAxisY);
 		sapAxisX /= axisSize;
@@ -46,8 +48,12 @@ public class Simulation implements Iterable<DiscBody> {
 		sapPara.updateBounds(timestep);
 		sapPerp.updateBounds(timestep);
 
-		sapPara.sweep();
-		sapPerp.sweep();
+		IntStream.range(0, 2).parallel().forEach(axis -> {
+			if (axis == 0)
+				sapPara.sweep();
+			else
+				sapPerp.sweep();
+		});
 		
 		sapPara.getRemovedOverlaps().each(overlap -> {
 			aabbOverlaps.remove(overlap);

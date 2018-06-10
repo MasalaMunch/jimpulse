@@ -44,13 +44,13 @@ public class SAP {
 		
 		DoubleArrayList oldBounds = DoubleArrayList.newList(bounds);
 		BooleanArrayList oldBoundTypes = BooleanArrayList.newList(boundTypes);
-		IntArrayList oldBoundBodies = IntArrayList.newList(boundBodyIndices);
+		IntArrayList oldBoundBodyIndices = IntArrayList.newList(boundBodyIndices);
 				
 		for (int i=0; i<indices.length; i++) {
 			int j = indices[i];
 			bounds.set(i, oldBounds.get(j));
 			boundTypes.set(i, oldBoundTypes.get(j));
-			boundBodyIndices.set(i, oldBoundBodies.get(j));
+			boundBodyIndices.set(i, oldBoundBodyIndices.get(j));
 		}
 
 		overlaps = new UnifiedSet<BodyIndexPair>();
@@ -62,7 +62,7 @@ public class SAP {
 			else {
 				int bodyIndexA = boundBodyIndices.get(i);
 				MutableIntIterator iter = activeBodyIndices.intIterator();
-				while(iter.hasNext())
+				while (iter.hasNext())
 					overlaps.add(new BodyIndexPair(bodyIndexA, iter.next()));
 				activeBodyIndices.add(bodyIndexA);
 			}
@@ -112,7 +112,8 @@ public class SAP {
 		addedOverlaps.clear();
 		removedOverlaps.clear();
 		
-		for (int i=1; i<bounds.size(); i++) {
+		final int boundCount = bounds.size();
+		for (int i=1; i<boundCount; i++) {
 			int rightIndex = i;
 			int rightBodyIndex = boundBodyIndices.get(rightIndex);
 			double right = bounds.get(rightIndex);
