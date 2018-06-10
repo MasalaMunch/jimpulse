@@ -36,7 +36,7 @@ public class Test extends Application {
 		
 		int bodyCount = 5000;
 		double velRange = 10;
-		double accelRange = 0;
+		double accelRange = 20;
 		double radiusRange = 10;
 		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {
@@ -67,11 +67,8 @@ public class Test extends Application {
 				sim.advance(TIMESTEP);
 				
 				gc.setFill(DISC_COLOR);
-				final int discBodyCount = sim.size();
-				for (int i=0; i<discBodyCount; i++) {
-					DiscBody db = sim.get(i);
+				for (DiscBody db : sim)
 					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
-				}
 			
 				long oldFrameTime = frameTimes[frameTimeIndex];
 				frameTimes[frameTimeIndex] = currentNanoTime;

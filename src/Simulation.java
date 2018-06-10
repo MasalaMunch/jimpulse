@@ -1,19 +1,20 @@
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.stream.IntStream;
 
+import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
-public class Simulation {
+public class Simulation implements Iterable<DiscBody> {
 	
-	private ArrayList<DiscBody> bodies;
+	private FastList<DiscBody> bodies;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
 	private UnifiedSet<BodyIndexPair> aabbOverlaps;
 	
 	public Simulation(DiscBody... bodies) {
 		
-		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
+		this.bodies = new FastList<DiscBody>(Arrays.asList(bodies));
 				
 		sapAxisX = 1280-280;
 		sapAxisY = 720+280;
@@ -37,14 +38,6 @@ public class Simulation {
 	//TODO bodies mutators
 	//TODO sapAxis mutator
 
-	public int size() {
-		return bodies.size();
-	}
-	
-	public DiscBody get(int i) {
-		return bodies.get(i);
-	}
-	
 	public void advance(double timestep) {
 		
 		sapPara.updateBounds(timestep);
@@ -80,10 +73,14 @@ public class Simulation {
 
 		//TODO design constraint solver
 		
-		final int bodyCount = bodies.size();
-		for (int i=0; i<bodyCount; i++)
-			bodies.get(i).advance(timestep);
+		for (DiscBody b : bodies)
+			b.advance(timestep);
 		
+	}
+
+	@Override
+	public Iterator<DiscBody> iterator() {
+		return bodies.iterator();
 	}
 
 }

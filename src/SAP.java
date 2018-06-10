@@ -112,11 +112,10 @@ public class SAP {
 		
 		addedOverlaps.clear();
 		removedOverlaps.clear();
-		
 		final int boundCount = bounds.size();
 		for (int i=1; i<boundCount; i++) {
 			int rightIndex = i;
-			for (int leftIndex = rightIndex-1; leftIndex >= 0; leftIndex--) {
+			for (int leftIndex = i-1; leftIndex >= 0; leftIndex--) {
 				if (bounds.get(leftIndex) <= bounds.get(rightIndex))
 					break;
 				if (boundTypes.get(leftIndex) ^ boundTypes.get(rightIndex)) {
@@ -141,21 +140,21 @@ public class SAP {
 	}
 	
 	private static void doubleSwap(DoubleArrayList a, int i, int j) {
-		double tmp = a.get(i);
+		final double cache = a.get(i);
 		a.set(i, a.get(j));
-		a.set(j, tmp);
+		a.set(j, cache);
 	}
 	
 	private static void intSwap(IntArrayList a, int i, int j) {
-		int tmp = a.get(i);
+		final int cache = a.get(i);
 		a.set(i, a.get(j));
-		a.set(j, tmp);
+		a.set(j, cache);
 	}
 	
 	private static void booleanSwap(BooleanArrayList a, int i, int j) {
-		boolean tmp = a.get(i);
+		final boolean cache = a.get(i);
 		a.set(i, a.get(j));
-		a.set(j, tmp);
+		a.set(j, cache);
 	}
 	
 }
