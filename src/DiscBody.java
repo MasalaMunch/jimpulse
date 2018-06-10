@@ -1,4 +1,5 @@
 
+
 public class DiscBody {
 	
 	private double mass, massInverse;

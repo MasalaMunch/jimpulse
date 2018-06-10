@@ -1,11 +1,10 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.stream.IntStream;
 
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
-public class Simulation implements Iterable<DiscBody> {
+public class Simulation {
 	
 	private ArrayList<DiscBody> bodies;
 	private double sapAxisX, sapAxisY;
@@ -38,9 +37,12 @@ public class Simulation implements Iterable<DiscBody> {
 	//TODO bodies mutators
 	//TODO sapAxis mutator
 
-	@Override
-	public Iterator<DiscBody> iterator() {
-		return bodies.iterator();
+	public int size() {
+		return bodies.size();
+	}
+	
+	public DiscBody get(int i) {
+		return bodies.get(i);
 	}
 	
 	public void advance(double timestep) {
@@ -78,9 +80,10 @@ public class Simulation implements Iterable<DiscBody> {
 
 		//TODO design constraint solver
 		
-		for (DiscBody b : bodies)
-			b.advance(timestep);
-
+		final int bodyCount = bodies.size();
+		for (int i=0; i<bodyCount; i++)
+			bodies.get(i).advance(timestep);
+		
 	}
 
 }

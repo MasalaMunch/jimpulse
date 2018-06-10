@@ -8,7 +8,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.lang.ref.WeakReference;
 
-
 public class Test extends Application {
 	
 	private static final double TIMESTEP = 1.0/60.0;
@@ -20,6 +19,7 @@ public class Test extends Application {
 	private static final String WINDOW_TITLE = "jimpulse";
 		
 	public static void main(String[] args) {
+		
 		launch(args);
 	}
 	
@@ -36,7 +36,7 @@ public class Test extends Application {
 		
 		int bodyCount = 5000;
 		double velRange = 10;
-		double accelRange = 0;
+		double accelRange = 50;
 		double radiusRange = 10;
 		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {
@@ -67,8 +67,11 @@ public class Test extends Application {
 				sim.advance(TIMESTEP);
 				
 				gc.setFill(DISC_COLOR);
-				for (DiscBody db : sim)				
+				final int discBodyCount = sim.size();
+				for (int i=0; i<discBodyCount; i++) {
+					DiscBody db = sim.get(i);
 					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
+				}
 			
 				long oldFrameTime = frameTimes[frameTimeIndex];
 				frameTimes[frameTimeIndex] = currentNanoTime;
