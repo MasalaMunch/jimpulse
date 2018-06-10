@@ -17,7 +17,7 @@ public class Test extends Application {
 	private static final Color FPS_COLOR = Color.WHITE;
 	private static final Color BG_COLOR = Color.BLACK;
 	private static final Color DISC_COLOR = Color.PURPLE;
-	private static final String WINDOW_TITLE = "Jimpulse";
+	private static final String WINDOW_TITLE = "jimpulse";
 		
 	public static void main(String[] args) {
 		launch(args);
@@ -50,14 +50,6 @@ public class Test extends Application {
 		}
 		Simulation sim = new Simulation(bodies);
 
-//		DiscBody b0 = new DiscBody(0, 0);
-//		b0.setVelX(100); b0.setVelX(100);
-//		DiscBody b1 = new DiscBody(0, RES_Y);
-//		b1.setVelX(100); b1.setVelY(-100);
-//		DiscBody b2 = new DiscBody(RES_X, RES_Y);
-//		b2.setVelX(-100); b2.setVelY(-100);
-//		Simulation sim = new Simulation(b0, b1, b2);
-		
 		forceGarbageCollection();
 		
 		new AnimationTimer() {

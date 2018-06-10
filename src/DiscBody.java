@@ -8,6 +8,17 @@ public class DiscBody {
 	private double forceX, forceY;
 	private double accelX, accelY;
 	
+	public DiscBody(double posX, double posY) {
+		setMass(1);
+		setRadius(40);
+		setPosX(posX);
+		setPosY(posY);
+		setVelX(0);
+		setVelY(0);
+		setForceX(0);
+		setForceY(0);
+	}
+	
 	public double getMass() {
 		return mass;
 	}
@@ -52,17 +63,6 @@ public class DiscBody {
 		return accelY;
 	}
 
-	public DiscBody(double posX, double posY) {
-		setMass(1);
-		setRadius(40);
-		setPosX(posX);
-		setPosY(posY);
-		setVelX(0);
-		setVelY(0);
-		setForceX(0);
-		setForceY(0);
-	}
-	
 	public void setMass(double mass) {
 		this.mass = mass;
 		massInverse = 1/mass;
