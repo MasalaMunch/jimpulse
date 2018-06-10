@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.eclipse.collections.api.iterator.MutableIntIterator;
@@ -12,11 +14,11 @@ import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 public class SAP {
 	
 	private double axisX, axisY;
-	private ArrayList<DiscBody> bodies;
+	private List<DiscBody> bodies;
 	private DoubleArrayList bounds;
 	private BooleanArrayList boundTypes; // false is min, true is max
 	private IntArrayList boundBodyIndices; // index of each bound's body in bodies
-	private UnifiedSet<BodyIndexPair> overlaps, addedOverlaps, removedOverlaps;
+	private Set<BodyIndexPair> overlaps, addedOverlaps, removedOverlaps;
 	
 	public SAP(double axisX, double axisY, DiscBody[] bodies) {
 		
@@ -74,15 +76,15 @@ public class SAP {
 
 	}
 	
-	public UnifiedSet<BodyIndexPair> getOverlaps() {
+	public Set<BodyIndexPair> getOverlaps() {
 		return overlaps;
 	}
 
-	public UnifiedSet<BodyIndexPair> getAddedOverlaps() {
+	public Set<BodyIndexPair> getAddedOverlaps() {
 		return addedOverlaps;
 	}
 
-	public UnifiedSet<BodyIndexPair> getRemovedOverlaps() {
+	public Set<BodyIndexPair> getRemovedOverlaps() {
 		return removedOverlaps;
 	}
 	

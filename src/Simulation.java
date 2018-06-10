@@ -1,5 +1,7 @@
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -7,18 +9,18 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class Simulation implements Iterable<DiscBody> {
 	
-	private FastList<DiscBody> bodies;
+	private List<DiscBody> bodies;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
-	private UnifiedSet<BodyIndexPair> aabbOverlaps;
+	private Set<BodyIndexPair> aabbOverlaps;
 	
 	public Simulation(DiscBody... bodies) {
 		
 		this.bodies = new FastList<DiscBody>(Arrays.asList(bodies));
-				
+		
+		//TODO automatically choose optimal axis
 		sapAxisX = 1280-280;
 		sapAxisY = 720+280;
-		
 		double axisSize = Math.sqrt(sapAxisX*sapAxisX + sapAxisY*sapAxisY);
 		sapAxisX /= axisSize;
 		sapAxisY /= axisSize;
@@ -28,10 +30,10 @@ public class Simulation implements Iterable<DiscBody> {
 		
 		aabbOverlaps = new UnifiedSet<BodyIndexPair>();
 		
-		sapPara.getOverlaps().forEach(overlap -> {
+		for (BodyIndexPair overlap : sapPara.getOverlaps()) {
 			if (sapPerp.getOverlaps().contains(overlap))
 				aabbOverlaps.add(overlap);
-		});
+		}
 		
 	}
 	
@@ -50,22 +52,20 @@ public class Simulation implements Iterable<DiscBody> {
 				sapPerp.sweep();
 		});
 		
-		sapPara.getRemovedOverlaps().each(overlap -> {
+		for (BodyIndexPair overlap : sapPara.getRemovedOverlaps())
 			aabbOverlaps.remove(overlap);
-		});
-		sapPerp.getRemovedOverlaps().each(overlap -> {
+		for (BodyIndexPair overlap : sapPerp.getRemovedOverlaps())
 			aabbOverlaps.remove(overlap);
-		});
-
-		sapPara.getAddedOverlaps().each(overlap -> {
+		
+		for (BodyIndexPair overlap : sapPara.getAddedOverlaps()) {
 			if (sapPerp.getOverlaps().contains(overlap))
 				aabbOverlaps.add(overlap);
-		});
-		sapPerp.getAddedOverlaps().each(overlap -> {
+		}
+		for (BodyIndexPair overlap : sapPerp.getAddedOverlaps()) {
 			if (sapPara.getOverlaps().contains(overlap))
 				aabbOverlaps.add(overlap);
-		});
-		
+		}
+				
 //		Test.println(aabbOverlaps.size());
 //		Test.println(sapPara.getAddedOverlaps().size(), sapPerp.getAddedOverlaps().size());
 //		Test.println(sapPara.getRemovedOverlaps().size(), sapPerp.getRemovedOverlaps().size());
