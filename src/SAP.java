@@ -1,12 +1,11 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.stream.IntStream;
 import org.eclipse.collections.api.iterator.MutableIntIterator;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 public class SAP {
@@ -16,16 +15,12 @@ public class SAP {
 	private DoubleArrayList bounds;
 	private BooleanArrayList boundTypes; // false is min, true is max
 	private IntArrayList boundBodyIndices; // index of each bound's body in bodies
-	private IntHashSet overlaps, addedOverlaps, removedOverlaps;
-	private boolean storeOverlapBodyIndices;
-	private HashMap<Integer,Integer> overlapBodyIndicesA, overlapBodyIndicesB;
+	private UnifiedSet<BodyIndexPair> overlaps, addedOverlaps, removedOverlaps;
 	
-	public SAP(double axisX, double axisY,
-			   boolean storeOverlapBodyIndices, DiscBody[] bodies) {
+	public SAP(double axisX, double axisY, DiscBody[] bodies) {
 		
 		this.axisX = axisX;
 		this.axisY = axisY;
-		this.storeOverlapBodyIndices = storeOverlapBodyIndices;
 		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
 		
 		bounds = new DoubleArrayList();
@@ -58,11 +53,7 @@ public class SAP {
 			boundBodyIndices.set(i, oldBoundBodies.get(j));
 		}
 
-		overlaps = new IntHashSet();
-		if (storeOverlapBodyIndices) {
-			overlapBodyIndicesA = new HashMap<Integer,Integer>();
-			overlapBodyIndicesB = new HashMap<Integer,Integer>();
-		}
+		overlaps = new UnifiedSet<BodyIndexPair>();
 		
 		IntHashSet activeBodyIndices = new IntHashSet();
 		for (int i=0; i<bounds.size(); i++) {
@@ -71,44 +62,29 @@ public class SAP {
 			else {
 				int bodyIndexA = boundBodyIndices.get(i);
 				MutableIntIterator iter = activeBodyIndices.intIterator();
-				while(iter.hasNext()) {
-					int bodyIndexB = iter.next();
-					int overlap = DiscBodyPair.hashCode(bodyIndexA, bodyIndexB);
-					overlaps.add(overlap);
-					if (storeOverlapBodyIndices) {
-						overlapBodyIndicesA.put(overlap, bodyIndexA);
-						overlapBodyIndicesB.put(overlap, bodyIndexB);
-					}
-				}
+				while(iter.hasNext())
+					overlaps.add(new BodyIndexPair(bodyIndexA, iter.next()));
 				activeBodyIndices.add(bodyIndexA);
 			}
 		}
 
-		addedOverlaps = new IntHashSet();
-		removedOverlaps = new IntHashSet();
+		addedOverlaps = new UnifiedSet<BodyIndexPair>();
+		removedOverlaps = new UnifiedSet<BodyIndexPair>();
 
 	}
 	
-	public IntHashSet getOverlaps() {
+	public UnifiedSet<BodyIndexPair> getOverlaps() {
 		return overlaps;
 	}
 
-	public IntHashSet getAddedOverlaps() {
+	public UnifiedSet<BodyIndexPair> getAddedOverlaps() {
 		return addedOverlaps;
 	}
 
-	public IntHashSet getRemovedOverlaps() {
+	public UnifiedSet<BodyIndexPair> getRemovedOverlaps() {
 		return removedOverlaps;
 	}
 	
-	public HashMap<Integer,Integer> getOverlapBodyIndicesA() {
-		return overlapBodyIndicesA;
-	}
-	
-	public HashMap<Integer,Integer> getOverlapBodyIndicesB() {
-		return overlapBodyIndicesB;
-	}
-
 	public void updateBounds(double timestep) {
 		
 		for (int i=0; i<bounds.size(); i++) {
@@ -136,7 +112,6 @@ public class SAP {
 		addedOverlaps.clear();
 		removedOverlaps.clear();
 		
-		int iterCount = 0;
 		for (int i=1; i<bounds.size(); i++) {
 			int rightIndex = i;
 			int rightBodyIndex = boundBodyIndices.get(rightIndex);
@@ -145,23 +120,15 @@ public class SAP {
 				if (bounds.get(leftIndex) <= right)
 					break;
 				if (boundTypes.get(leftIndex) ^ boundTypes.get(rightIndex)) {
-					iterCount++;
-					int leftBodyIndex = boundBodyIndices.get(leftIndex);
-					int overlap = DiscBodyPair.hashCode(leftBodyIndex, rightBodyIndex);
-					if (overlaps.add(overlap)) {
+					BodyIndexPair overlap = new BodyIndexPair(
+							boundBodyIndices.get(leftIndex),
+							rightBodyIndex
+							);
+					if (overlaps.add(overlap))
 						addedOverlaps.add(overlap);
-						if (storeOverlapBodyIndices) {
-							overlapBodyIndicesA.put(overlap, leftBodyIndex);
-							overlapBodyIndicesB.put(overlap, rightBodyIndex);
-						}
-					}
 					else {
 						overlaps.remove(overlap);
 						removedOverlaps.add(overlap);
-						if (storeOverlapBodyIndices) {
-							overlapBodyIndicesA.remove(overlap);
-							overlapBodyIndicesB.remove(overlap);
-						}
 					}
 				}
 				doubleSwap(bounds, leftIndex, rightIndex);
@@ -170,7 +137,6 @@ public class SAP {
 				rightIndex--;
 			}
 		}
-//		Test.println("iterCount", iterCount);
 		
 	}
 	
