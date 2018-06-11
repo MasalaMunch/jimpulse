@@ -2,12 +2,15 @@
 
 public class DiscBody {
 	
+	private static int nextHashCode = 0;
+	
 	private double mass, massInverse;
 	private double radius;
 	private double posX, posY;
 	private double velX, velY;
 	private double forceX, forceY;
 	private double accelX, accelY;
+	private final int hashCode;
 	
 	public DiscBody(double posX, double posY) {
 		setMass(1);
@@ -18,6 +21,12 @@ public class DiscBody {
 		setVelY(0);
 		setForceX(0);
 		setForceY(0);
+		hashCode = nextHashCode++;
+	}
+	
+	@Override
+	public int hashCode() {
+		return hashCode;
 	}
 	
 	public double getMass() {

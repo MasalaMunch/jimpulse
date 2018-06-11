@@ -8,7 +8,8 @@ public class BodyPair {
 	public BodyPair(DiscBody a, DiscBody b) {
 		bodyA = a;
 		bodyB = b;
-		hashCode = a.hashCode() + b.hashCode();
+		hashCode = a.hashCode() * b.hashCode()
+				   + a.hashCode() + b.hashCode();
 	}
 	
 	public boolean equals(BodyPair other) {

@@ -10,8 +10,7 @@ import java.lang.ref.WeakReference;
 
 public class Test extends Application {
 	
-	private static final boolean FIX_TIMESTEP = true;
-	private static final double TIMESTEP_FIX = 1.0/60.0;
+	private static final double TIMESTEP = 1.0/60.0;
 	private static final double RES_X = 1280;
 	private static final double RES_Y = 720;
 	private static final Color FPS_COLOR = Color.WHITE;
@@ -58,7 +57,6 @@ public class Test extends Application {
 			long[] frameTimes = new long[100];
 			int frameTimeIndex = 0;
 			boolean arrayFilled = false;
-			long prevNanoTime = System.nanoTime();
 			
 			@Override
 			public void handle(long currNanoTime) {
@@ -68,7 +66,7 @@ public class Test extends Application {
 				
 				DiscBody newDb = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
 //				newDb.setAccelY(200); // gravity
-//				newDb.setVelY(-500); // initial jump before gravity pulls it down
+//				newDb.setVelY(-200); // initial jump before gravity pulls it down
 				newDb.setRadius(Math.random()*radiusRange);
 				newDb.setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
 				newDb.setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
@@ -76,10 +74,7 @@ public class Test extends Application {
 				newDb.setAccelY(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
 				sim.add(newDb);
 				
-				if (FIX_TIMESTEP)
-					sim.advance(TIMESTEP_FIX);
-				else
-					sim.advance((currNanoTime-prevNanoTime)/1_000_000_000.0);
+				sim.advance(TIMESTEP);
 								
 				gc.setFill(DISC_COLOR);
 				for (DiscBody db : sim)
@@ -97,8 +92,6 @@ public class Test extends Application {
     				gc.setFill(FPS_COLOR);
     				gc.fillText(frameRate.toString(), 0, RES_Y);
 				}
-				
-				prevNanoTime = currNanoTime;
 				
 			}
 			
