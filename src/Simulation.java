@@ -1,7 +1,6 @@
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -9,14 +8,14 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class Simulation implements Iterable<DiscBody> {
 	
-	private List<DiscBody> bodies;
+	private Set<DiscBody> bodies;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
-	private Set<BodyIndexPair> aabbOverlaps;
+	private Set<BodyPair> aabbOverlaps;
 	
 	public Simulation(DiscBody... bodies) {
 		
-		this.bodies = new ArrayList<DiscBody>();
+		this.bodies = new UnifiedSet<DiscBody>();
 		
 		//TODO automatically choose optimal axis
 		sapAxisX = 1280-280;
@@ -27,7 +26,7 @@ public class Simulation implements Iterable<DiscBody> {
 		sapPara = new SAP(sapAxisX, sapAxisY);
 		sapPerp = new SAP(sapAxisY, -1*sapAxisX);
 		
-		aabbOverlaps = new UnifiedSet<BodyIndexPair>();
+		aabbOverlaps = new UnifiedSet<BodyPair>();
 		
 		addAll(Arrays.asList(bodies));
 				
@@ -39,13 +38,12 @@ public class Simulation implements Iterable<DiscBody> {
 		sapPerp.add(body);
 	}
 	
-	public void addAll(List<DiscBody> bodies) {
+	public void addAll(Collection<DiscBody> bodies) {
 		this.bodies.addAll(bodies);
 		sapPara.addAll(bodies);
 		sapPerp.addAll(bodies);
 	}
 	
-	//TODO switch from bodyIndices to bodyPointers
 	//TODO removal mutators
 	//TODO sapAxis mutator
 
@@ -58,21 +56,21 @@ public class Simulation implements Iterable<DiscBody> {
 				sapPerp.updateOverlaps(timestep);
 		});
 		
-		for (BodyIndexPair overlap : sapPara.getRemovedOverlaps())
+		for (BodyPair overlap : sapPara.getRemovedOverlaps())
 			aabbOverlaps.remove(overlap);
-		for (BodyIndexPair overlap : sapPerp.getRemovedOverlaps())
+		for (BodyPair overlap : sapPerp.getRemovedOverlaps())
 			aabbOverlaps.remove(overlap);
 		
-		for (BodyIndexPair overlap : sapPara.getAddedOverlaps()) {
+		for (BodyPair overlap : sapPara.getAddedOverlaps()) {
 			if (sapPerp.getOverlaps().contains(overlap))
 				aabbOverlaps.add(overlap);
 		}
-		for (BodyIndexPair overlap : sapPerp.getAddedOverlaps()) {
+		for (BodyPair overlap : sapPerp.getAddedOverlaps()) {
 			if (sapPara.getOverlaps().contains(overlap))
 				aabbOverlaps.add(overlap);
 		}
 				
-		Test.println(aabbOverlaps.size());
+		Test.println(bodies.size(), "bodies", aabbOverlaps.size(), "overlaps");
 //		Test.println(sapPara.getAddedOverlaps().size(), sapPerp.getAddedOverlaps().size());
 //		Test.println(sapPara.getRemovedOverlaps().size(), sapPerp.getRemovedOverlaps().size());
 //		Test.println();

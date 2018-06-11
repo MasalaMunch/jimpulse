@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 
 public class Test extends Application {
 	
-	private static final boolean FIX_TIMESTEP = false;
+	private static final boolean FIX_TIMESTEP = true;
 	private static final double TIMESTEP_FIX = 1.0/60.0;
 	private static final double RES_X = 1280;
 	private static final double RES_Y = 720;
@@ -37,7 +37,7 @@ public class Test extends Application {
 		
 		int bodyCount = 0;
 		double velRange = 10;
-		double accelRange = 50;
+		double accelRange = 0;
 		double radiusRange = 10;
 		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {

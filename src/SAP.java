@@ -1,60 +1,59 @@
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class SAP {
 	
 	private double axisX, axisY;
-	private List<DiscBody> bodies, addedBodies;
-	private boolean bodiesWereAdded;
-	private Set<BodyIndexPair> overlaps, addedOverlaps, removedOverlaps;
+	private Set<BodyPair> overlaps, addedOverlaps, removedOverlaps;
 	private DoubleArrayList bounds;
 	private BooleanArrayList boundTypes; // false is min, true is max
-	private IntArrayList boundBodyIndices;
+	private List<DiscBody> boundBodies;
+	private Set<DiscBody> newBodies;
+	private boolean newBodiesExist;
 	
 	public SAP(double axisX, double axisY) {
 		
 		this.axisX = axisX;
 		this.axisY = axisY;
 		
-		bodies = new ArrayList<DiscBody>();
-		addedBodies = new ArrayList<DiscBody>();
-		
-		bodiesWereAdded = false;
-		
-		overlaps = new UnifiedSet<BodyIndexPair>();
-		addedOverlaps = new UnifiedSet<BodyIndexPair>();
-		removedOverlaps = new UnifiedSet<BodyIndexPair>();
+		overlaps = new UnifiedSet<BodyPair>();
+		addedOverlaps = new UnifiedSet<BodyPair>();
+		removedOverlaps = new UnifiedSet<BodyPair>();
 		
 		bounds = new DoubleArrayList();
 		boundTypes = new BooleanArrayList();
-		boundBodyIndices = new IntArrayList();
+		boundBodies = new ArrayList<DiscBody>();
+		
+		newBodies = new UnifiedSet<DiscBody>();
+		newBodiesExist = false;
 
 	}
 	
-	public void addAll(List<DiscBody> bodies) {
-		addedBodies.addAll(bodies);
-		bodiesWereAdded = true;
+	public void addAll(Collection<DiscBody> bodies) {
+		newBodies.addAll(bodies);
+		newBodiesExist = true;
 	}
 	
 	public void add(DiscBody body) {
-		addedBodies.add(body);
-		bodiesWereAdded = true;
+		newBodies.add(body);
+		newBodiesExist = true;
 	}
 	
-	public Set<BodyIndexPair> getOverlaps() {
+	public Set<BodyPair> getOverlaps() {
 		return overlaps;
 	}
 
-	public Set<BodyIndexPair> getAddedOverlaps() {
+	public Set<BodyPair> getAddedOverlaps() {
 		return addedOverlaps;
 	}
 
-	public Set<BodyIndexPair> getRemovedOverlaps() {
+	public Set<BodyPair> getRemovedOverlaps() {
 		return removedOverlaps;
 	}
 	
@@ -66,7 +65,7 @@ public class SAP {
 		final int boundCount = bounds.size();
 		
 		for (int i=0; i<boundCount; i++)
-			bounds.set(i, bodies.get(boundBodyIndices.get(i)).getBound(
+			bounds.set(i, boundBodies.get(i).getBound(
 					timestep, axisX, axisY, boundTypes.get(i))
 					);
 		
@@ -76,9 +75,9 @@ public class SAP {
 				if (bounds.get(leftIndex) <= bounds.get(rightIndex))
 					break;
 				if (boundTypes.get(leftIndex) ^ boundTypes.get(rightIndex)) {
-					BodyIndexPair overlap = new BodyIndexPair(
-							boundBodyIndices.get(leftIndex),
-							boundBodyIndices.get(rightIndex)
+					BodyPair overlap = new BodyPair(
+							boundBodies.get(leftIndex),
+							boundBodies.get(rightIndex)
 							);
 					if (overlaps.add(overlap))
 						addedOverlaps.add(overlap);
@@ -89,34 +88,32 @@ public class SAP {
 				}
 				doubleSwap(bounds, leftIndex, rightIndex);
 				booleanSwap(boundTypes, leftIndex, rightIndex);
-				intSwap(boundBodyIndices, leftIndex, rightIndex);
+				Collections.swap(boundBodies, leftIndex, rightIndex);
 				rightIndex--;
 			}
 		}
 				
-		if (bodiesWereAdded) {
-			
-			int newBodyIndex = bodies.size();
-			for (DiscBody b : addedBodies) {
-				
-				double min = b.getBound(timestep, axisX, axisY, false);
+		if (newBodiesExist) {
+			for (DiscBody body : newBodies) {
+	
+				double min = body.getBound(timestep, axisX, axisY, false);
 				int minIndex = bounds.binarySearch(min);
 				boolean uniqueMin = minIndex < 0;
 				if (uniqueMin)
 					minIndex = -1*(minIndex+1);
 				bounds.addAtIndex(minIndex, min);
 				boundTypes.addAtIndex(minIndex, false);
-				boundBodyIndices.addAtIndex(minIndex, newBodyIndex);
+				boundBodies.add(minIndex, body);
 				
 				int maxIndex = minIndex+1;
 				if (!uniqueMin) {
 					while (maxIndex < bounds.size() && bounds.get(maxIndex) == min)
 						maxIndex++;
 				}
-				double max = b.getBound(timestep, axisX, axisY, true);
+				double max = body.getBound(timestep, axisX, axisY, true);
 				while (maxIndex < bounds.size() && bounds.get(maxIndex) < max) {
-					BodyIndexPair overlap = new BodyIndexPair(
-							newBodyIndex, boundBodyIndices.get(maxIndex)
+					BodyPair overlap = new BodyPair(
+							body, boundBodies.get(maxIndex)
 							);
 					overlaps.add(overlap);
 					addedOverlaps.add(overlap);
@@ -124,26 +121,17 @@ public class SAP {
 				}
 				bounds.addAtIndex(maxIndex, max);
 				boundTypes.addAtIndex(maxIndex, true);
-				boundBodyIndices.addAtIndex(maxIndex, newBodyIndex);
+				boundBodies.add(maxIndex, body);
 				
-				newBodyIndex++;
 			}
-			bodies.addAll(addedBodies);
-			addedBodies = new ArrayList<DiscBody>();
-			bodiesWereAdded = false;
-			
+			newBodies.clear();
+			newBodiesExist = false;	
 		}
 		
 	}
 		
 	private static void doubleSwap(DoubleArrayList a, int i, int j) {
 		final double cache = a.get(i);
-		a.set(i, a.get(j));
-		a.set(j, cache);
-	}
-	
-	private static void intSwap(IntArrayList a, int i, int j) {
-		final int cache = a.get(i);
 		a.set(i, a.get(j));
 		a.set(j, cache);
 	}
