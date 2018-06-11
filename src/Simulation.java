@@ -1,10 +1,10 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class Simulation implements Iterable<DiscBody> {
@@ -16,7 +16,7 @@ public class Simulation implements Iterable<DiscBody> {
 	
 	public Simulation(DiscBody... bodies) {
 		
-		this.bodies = new FastList<DiscBody>(Arrays.asList(bodies));
+		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
 		
 		//TODO automatically choose optimal axis
 		sapAxisX = 1280-280;
