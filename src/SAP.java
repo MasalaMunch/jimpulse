@@ -29,16 +29,12 @@ public class SAP {
 		bounds = new DoubleArrayList();
 		boundTypes = new BooleanArrayList();
 		boundBodyIndices = new IntArrayList();
-
-		bounds.addAll(new double[2*bodies.length]);
-		boundTypes.addAll(new boolean[2*bodies.length]);
-		boundBodyIndices.addAll(new int[2*bodies.length]);
 		
 		for (int i=0; i<bodies.length; i++) {
-			boundTypes.set(2*i+1, true);
-			boundBodyIndices.set(2*i, i);
-			boundBodyIndices.set(2*i+1, i);
-		}
+			bounds.addAll(0, 0);
+			boundTypes.addAll(false, true);
+			boundBodyIndices.addAll(i, i);
+		}		
 		
 		updateBounds(0);
 		

@@ -35,8 +35,8 @@ public class Test extends Application {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
 		int bodyCount = 5000;
-		double velRange = 10;
-		double accelRange = 20;
+		double velRange = 20;
+		double accelRange = 0;
 		double radiusRange = 10;
 		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {
