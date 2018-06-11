@@ -47,9 +47,9 @@ public class Simulation implements Iterable<DiscBody> {
 
 		IntStream.range(0, 2).parallel().forEach(axis -> {
 			if (axis == 0)
-				sapPara.sweep();
+				sapPara.updateOverlaps();
 			else
-				sapPerp.sweep();
+				sapPerp.updateOverlaps();
 		});
 		
 		for (BodyIndexPair overlap : sapPara.getRemovedOverlaps())

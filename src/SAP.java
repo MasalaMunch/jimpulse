@@ -110,8 +110,8 @@ public class SAP {
 		}
 		
 	}
-	
-	public void sweep() {
+		
+	public void updateOverlaps() {
 		
 		addedOverlaps.clear();
 		removedOverlaps.clear();
