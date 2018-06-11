@@ -114,4 +114,24 @@ public class DiscBody {
 		velY += accelY*timestep;
 	}
 	
+	public double getBound(double timestep, double axisX, double axisY, boolean boundType) {
+		
+		final double pos = axisX*posX + axisY*posY;
+		final double posChange = timestep*(axisX*velX + axisY*velY);
+		
+		if (posChange > 0) {
+			if (boundType)
+				return pos + radius + posChange;
+			else
+				return pos - radius;
+		}
+		else {
+			if (boundType)
+				return pos + radius;
+			else
+				return pos - radius + posChange;
+		}
+		
+	}
+	
 }

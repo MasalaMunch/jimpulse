@@ -16,7 +16,7 @@ public class Simulation implements Iterable<DiscBody> {
 	
 	public Simulation(DiscBody... bodies) {
 		
-		this.bodies = new ArrayList<DiscBody>(Arrays.asList(bodies));
+		this.bodies = new ArrayList<DiscBody>();
 		
 		//TODO automatically choose optimal axis
 		sapAxisX = 1280-280;
@@ -24,32 +24,38 @@ public class Simulation implements Iterable<DiscBody> {
 		double axisSize = Math.sqrt(sapAxisX*sapAxisX + sapAxisY*sapAxisY);
 		sapAxisX /= axisSize;
 		sapAxisY /= axisSize;
-		
-		sapPara = new SAP(sapAxisX, sapAxisY, bodies);
-		sapPerp = new SAP(sapAxisY, -1*sapAxisX, bodies);
+		sapPara = new SAP(sapAxisX, sapAxisY);
+		sapPerp = new SAP(sapAxisY, -1*sapAxisX);
 		
 		aabbOverlaps = new UnifiedSet<BodyIndexPair>();
 		
-		for (BodyIndexPair overlap : sapPara.getOverlaps()) {
-			if (sapPerp.getOverlaps().contains(overlap))
-				aabbOverlaps.add(overlap);
-		}
+		addAll(Arrays.asList(bodies));
+				
+	}
 		
+	public void add(DiscBody body) {
+		bodies.add(body);
+		sapPara.add(body);
+		sapPerp.add(body);
 	}
 	
-	//TODO bodies mutators
+	public void addAll(List<DiscBody> bodies) {
+		this.bodies.addAll(bodies);
+		sapPara.addAll(bodies);
+		sapPerp.addAll(bodies);
+	}
+	
+	//TODO switch from bodyIndices to bodyPointers
+	//TODO removal mutators
 	//TODO sapAxis mutator
 
 	public void advance(double timestep) {
 		
-		sapPara.updateBounds(timestep);
-		sapPerp.updateBounds(timestep);
-
 		IntStream.range(0, 2).parallel().forEach(axis -> {
 			if (axis == 0)
-				sapPara.updateOverlaps();
+				sapPara.updateOverlaps(timestep);
 			else
-				sapPerp.updateOverlaps();
+				sapPerp.updateOverlaps(timestep);
 		});
 		
 		for (BodyIndexPair overlap : sapPara.getRemovedOverlaps())
@@ -66,7 +72,7 @@ public class Simulation implements Iterable<DiscBody> {
 				aabbOverlaps.add(overlap);
 		}
 				
-//		Test.println(aabbOverlaps.size());
+		Test.println(aabbOverlaps.size());
 //		Test.println(sapPara.getAddedOverlaps().size(), sapPerp.getAddedOverlaps().size());
 //		Test.println(sapPara.getRemovedOverlaps().size(), sapPerp.getRemovedOverlaps().size());
 //		Test.println();
