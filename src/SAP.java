@@ -90,7 +90,8 @@ public class SAP {
 	
 	public void updateBounds(double timestep) {
 		
-		for (int i=0; i<bounds.size(); i++) {
+		final int boundCount = bounds.size();
+		for (int i=0; i<boundCount; i++) {
 			DiscBody b = bodies.get(boundBodyIndices.get(i));
 			double bPos = axisX*b.getPosX() + axisY*b.getPosY();
 			double bPosChange = timestep*(axisX*b.getVelX() + axisY*b.getVelY());
