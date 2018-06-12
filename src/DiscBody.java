@@ -2,7 +2,7 @@
 
 public class DiscBody {
 	
-	private static int nextHashCode = 0;
+	private static int NextHashCode = 0;
 	
 	private double mass, massInverse;
 	private double radius;
@@ -21,7 +21,7 @@ public class DiscBody {
 		setVelY(0);
 		setForceX(0);
 		setForceY(0);
-		hashCode = nextHashCode++;
+		hashCode = NextHashCode++;
 	}
 	
 	@Override
@@ -36,7 +36,7 @@ public class DiscBody {
 	public double getMassInverse() {
 		return massInverse;
 	}
-		
+	
 	public double getRadius() {
 		return radius;
 	}
@@ -76,6 +76,8 @@ public class DiscBody {
 	public void setMass(double mass) {
 		this.mass = mass;
 		massInverse = 1/mass;
+		setAccelX(forceX*massInverse);
+		setAccelY(forceY*massInverse);
 	}
 	
 	public void setRadius(double radius) {
@@ -142,5 +144,5 @@ public class DiscBody {
 		}
 		
 	}
-	
+		
 }

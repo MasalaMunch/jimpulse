@@ -7,6 +7,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Test extends Application {
 	
@@ -64,16 +66,36 @@ public class Test extends Application {
 				gc.setFill(BG_COLOR);
 				gc.fillRect(0, 0, RES_X, RES_Y);
 				
-				DiscBody newDb = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
-//				newDb.setAccelY(200); // gravity
-//				newDb.setVelY(-200); // initial jump before gravity pulls it down
-				newDb.setRadius(Math.random()*radiusRange);
-				newDb.setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
-				newDb.setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
-				newDb.setAccelX(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
-				newDb.setAccelY(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
-				sim.add(newDb);
+				if (Math.random() > 0.0) {
+					DiscBody newDb = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
+					newDb.setAccelY(200); // gravity
+					newDb.setVelY(-50); // initial jump before gravity pulls it down
+					newDb.setRadius(Math.random()*radiusRange);
+					newDb.setAccelX(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
+//					newDb.setAccelY(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
+					newDb.setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
+//					newDb.setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
+					sim.add(newDb);
+				}
 				
+				if (Math.random() > 1.0) {
+					DiscBody removeDb = null;
+					for (DiscBody db : sim) {
+						removeDb = db;
+						break;
+					}
+					if (removeDb != null)
+						sim.remove(removeDb);
+				}
+				
+				Collection<DiscBody> toRemove = new ArrayList<DiscBody>();
+				for (DiscBody db : sim) {
+					if (db.getPosY() - db.getRadius() > RES_Y)
+						toRemove.add(db);
+				}
+				for (DiscBody db : toRemove)
+					sim.remove(db);
+								
 				sim.advance(TIMESTEP);
 								
 				gc.setFill(DISC_COLOR);
