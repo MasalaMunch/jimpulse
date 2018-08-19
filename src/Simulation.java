@@ -1,5 +1,6 @@
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -7,27 +8,25 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class Simulation implements Iterable<DiscBody> {
 	
-	private Set<DiscBody> bodies;
+	private List<DiscBody> bodies;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
 	private Set<BodyPair> aabbOverlaps;
 	
 	public Simulation(DiscBody... bodies) {
 		
-		this.bodies = new UnifiedSet<DiscBody>();
+		this.bodies = new ArrayList<DiscBody>();
 		
-		//TODO automatically choose optimal axis
+		//TODO automatically choose optimal axes
 		sapAxisX = 1280-280;
 		sapAxisY = 720+280;
 		double axisSize = Math.sqrt(sapAxisX*sapAxisX + sapAxisY*sapAxisY);
 		sapAxisX /= axisSize;
 		sapAxisY /= axisSize;
-		sapPara = new SAP(sapAxisX, sapAxisY);
-		sapPerp = new SAP(sapAxisY, -1*sapAxisX);
+		sapPara = new SAP(sapAxisX, sapAxisY, bodies);
+		sapPerp = new SAP(sapAxisY, -1*sapAxisX, bodies);
 		
 		aabbOverlaps = new UnifiedSet<BodyPair>();
-		
-		addAll(Arrays.asList(bodies));
 
 	}
 	
@@ -35,44 +34,6 @@ public class Simulation implements Iterable<DiscBody> {
 		return bodies.size();
 	}
 		
-	public boolean add(DiscBody body) {
-		final boolean out = bodies.add(body);
-		if (out) {
-			sapPara.add(body);
-			sapPerp.add(body);
-		}
-		return out;
-	}
-	
-	public boolean remove(DiscBody body) {
-		final boolean out = bodies.remove(body);
-		if (out) {
-			sapPara.remove(body);
-			sapPerp.remove(body);
-		}
-		return out;
-	}
-	
-	public boolean addAll(Iterable<DiscBody> bodies) {
-		boolean out = false;
-		for (DiscBody body : bodies) {
-			if (add(body))
-				out = true;
-		}
-		return out;
-	}
-	
-	public boolean removeAll(Iterable<DiscBody> bodies) {
-		boolean out = false;
-		for (DiscBody body : bodies) {
-			if (remove(body))
-				out = true;
-		}
-		return out;
-	}
-	
-	//TODO sapAxis mutator
-
 	public void advance(double timestep) {
 		
 		//TODO re-enable parallel() when you're done debugging
@@ -97,10 +58,7 @@ public class Simulation implements Iterable<DiscBody> {
 				aabbOverlaps.add(overlap);
 		}
 				
-//		Test.println(bodies.size(), "bodies", aabbOverlaps.size(), "overlaps");
-//		Test.println(sapPara.getAddedOverlaps().size(), sapPerp.getAddedOverlaps().size());
-//		Test.println(sapPara.getRemovedOverlaps().size(), sapPerp.getRemovedOverlaps().size());
-//		Test.println();
+		Test.println(bodies.size(), "bodies", aabbOverlaps.size(), "overlaps");
 
 		//TODO design constraint solver
 		

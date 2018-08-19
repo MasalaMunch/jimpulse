@@ -13,10 +13,7 @@ public class SAP {
 	private DoubleArrayList bounds;
 	private BooleanArrayList boundTypes; // false is min, true is max
 	private List<DiscBody> boundBodies;
-	private boolean newBodiesExist, oldBodiesExist;
-	private Set<DiscBody> newBodies, oldBodies;
-	
-	public SAP(double axisX, double axisY) {
+	public SAP(double axisX, double axisY, DiscBody... bodies) {
 		
 		this.axisX = axisX;
 		this.axisY = axisY;
@@ -29,26 +26,10 @@ public class SAP {
 		boundTypes = new BooleanArrayList();
 		boundBodies = new ArrayList<DiscBody>();
 		
-		newBodiesExist = false;
-		oldBodiesExist = false;
+		//TODO add bodies
 		
-		newBodies = new UnifiedSet<DiscBody>();
-		oldBodies = new UnifiedSet<DiscBody>();
-
-	}
-	
-	public void add(DiscBody body) {
-		if (!oldBodies.remove(body)) {
-			newBodies.add(body);
-			newBodiesExist = true;
-		}
-	}
-	
-	public void remove(DiscBody body) {
-		if (!newBodies.remove(body)) {
-			oldBodies.add(body);
-			oldBodiesExist = true;
-		}
+		
+		
 	}
 	
 	public Set<BodyPair> getOverlaps() {
@@ -99,113 +80,8 @@ public class SAP {
 			}
 		}
 		
-		if (oldBodiesExist)
-			removeOldBodies(timestep);
-				
-		if (newBodiesExist)
-			addNewBodies(timestep);
-		
 	}
-	
-	private void removeOldBodies(double timestep) {
-		
-		for (DiscBody body : oldBodies) {
 			
-			double min = body.getBound(timestep, axisX, axisY, false);
-			int minIndex = getIndex(body, min);
-			
-			double max = body.getBound(timestep, axisX, axisY, true);
-			int maxIndex = minIndex+1;
-			while (bounds.get(maxIndex) == min)
-				maxIndex++;
-			while (bounds.get(maxIndex) != max) {
-				BodyPair overlap = new BodyPair(
-						body, boundBodies.get(maxIndex)
-						);
-				overlaps.remove(overlap);
-				removedOverlaps.add(overlap);
-				maxIndex++;
-			}
-			while (boundBodies.get(maxIndex) != body)
-				maxIndex++;
-			
-			bounds.removeAtIndex(minIndex);
-			boundTypes.removeAtIndex(minIndex);
-			boundBodies.remove(minIndex);
-			maxIndex--;
-			bounds.removeAtIndex(maxIndex);
-			boundTypes.removeAtIndex(maxIndex);
-			boundBodies.remove(maxIndex);
-			
-		}
-		
-		oldBodies.clear();
-		oldBodiesExist = false;
-		
-	}
-	
-	private void addNewBodies(double timestep) {
-		
-		for (DiscBody body : newBodies) {
-			
-			double min = body.getBound(timestep, axisX, axisY, false);
-			int minIndex = bounds.binarySearch(min);
-			boolean uniqueMin = (minIndex < 0);
-			if (uniqueMin)
-				minIndex = -1*(minIndex+1);
-			bounds.addAtIndex(minIndex, min);
-			boundTypes.addAtIndex(minIndex, false);
-			boundBodies.add(minIndex, body);
-			
-			int maxIndex = minIndex+1;
-			if (!uniqueMin) {
-				maxIndex++;
-				while (maxIndex < bounds.size() && bounds.get(maxIndex) == min)
-					maxIndex++;
-			}
-			double max = body.getBound(timestep, axisX, axisY, true);
-			while (maxIndex < bounds.size() && bounds.get(maxIndex) < max) {
-				BodyPair overlap = new BodyPair(
-						body, boundBodies.get(maxIndex)
-						);
-				overlaps.add(overlap);
-				addedOverlaps.add(overlap);
-				maxIndex++;
-			}
-			bounds.addAtIndex(maxIndex, max);
-			boundTypes.addAtIndex(maxIndex, true);
-			boundBodies.add(maxIndex, body);
-			
-		}
-		
-		newBodies.clear();
-		newBodiesExist = false;	
-
-	}
-	
-	private int getIndex(DiscBody body, double bound) {
-		
-		final int bs = bounds.binarySearch(bound);
-		if (boundBodies.get(bs) == body)
-			return bs;
-		
-		int upper = bs + 1;
-		while (bounds.get(upper) == bound) {
-			if (boundBodies.get(upper) == body)
-				return upper;
-			upper++;
-		}
-		int lower = bs - 1;
-		while (bounds.get(lower) == bound) {
-			if (boundBodies.get(lower) == body)
-				return lower;
-			lower--;
-		}
-		
-		return -1;
-		
-	}
-		
 	private static void doubleSwap(DoubleArrayList a, int i, int j) {
 		final double cache = a.get(i);
 		a.set(i, a.get(j));

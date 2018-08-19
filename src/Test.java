@@ -37,9 +37,9 @@ public class Test extends Application {
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
 		int bodyCount = 0;
-		double velRange = 10;
+		double velRange = 20;
 		double accelRange = 0;
-		double radiusRange = 10;
+		double radiusRange = 80;
 		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {
 			bodies[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
@@ -65,36 +65,6 @@ public class Test extends Application {
 				
 				gc.setFill(BG_COLOR);
 				gc.fillRect(0, 0, RES_X, RES_Y);
-				
-				if (Math.random() > 0.0) {
-					DiscBody newDb = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
-					newDb.setAccelY(200); // gravity
-					newDb.setVelY(-50); // initial jump before gravity pulls it down
-					newDb.setRadius(Math.random()*radiusRange);
-					newDb.setAccelX(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
-//					newDb.setAccelY(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
-					newDb.setVelX(Math.random()*velRange * (Math.random()>0.5? 1:-1));
-//					newDb.setVelY(Math.random()*velRange * (Math.random()>0.5? 1:-1));
-					sim.add(newDb);
-				}
-				
-				if (Math.random() > 1.0) {
-					DiscBody removeDb = null;
-					for (DiscBody db : sim) {
-						removeDb = db;
-						break;
-					}
-					if (removeDb != null)
-						sim.remove(removeDb);
-				}
-				
-				Collection<DiscBody> toRemove = new ArrayList<DiscBody>();
-				for (DiscBody db : sim) {
-					if (db.getPosY() - db.getRadius() > RES_Y)
-						toRemove.add(db);
-				}
-				for (DiscBody db : toRemove)
-					sim.remove(db);
 								
 				sim.advance(TIMESTEP);
 								
