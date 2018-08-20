@@ -139,8 +139,9 @@ public class DiscBody {
 		else {
 			if (boundType)
 				return pos + radius;
-			else
+			else {
 				return pos - radius + posChange;
+			}
 		}
 		
 	}

@@ -26,8 +26,7 @@ public class BodyPair {
 	public boolean equals(Object o) {
 		if (o instanceof BodyPair)
 			return equals((BodyPair) o);
-		else
-			return false;
+		return false;
 	}
 		
 	public DiscBody getBodyA() {

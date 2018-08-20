@@ -17,7 +17,6 @@ public class Test extends Application {
 	private static final double RES_Y = 720;
 	private static final Color FPS_COLOR = Color.WHITE;
 	private static final Color BG_COLOR = Color.BLACK;
-	private static final Color DISC_COLOR = Color.PURPLE;
 	private static final String WINDOW_TITLE = "jimpulse";
 		
 	public static void main(String[] args) {
@@ -36,10 +35,10 @@ public class Test extends Application {
 		root.getChildren().add(canvas);
 		GraphicsContext gc = canvas.getGraphicsContext2D();
 		
-		int bodyCount = 0;
-		double velRange = 20;
+		int bodyCount = 2000;
+		double velRange = 50;
 		double accelRange = 0;
-		double radiusRange = 80;
+		double radiusRange = 60;
 		DiscBody[] bodies = new DiscBody[bodyCount];
 		for (int i=0; i<bodies.length; i++) {
 			bodies[i] = new DiscBody(Math.random()*RES_X, Math.random()*RES_Y);
@@ -50,6 +49,7 @@ public class Test extends Application {
 //			bodies[i].setAccelY(200); // gravity
 			bodies[i].setAccelX(Math.random()*accelRange * (Math.random()>0.5? 1:-1));
 		}
+		
 		Simulation sim = new Simulation(bodies);
 
 		forceGarbageCollection();
@@ -67,10 +67,13 @@ public class Test extends Application {
 				gc.fillRect(0, 0, RES_X, RES_Y);
 								
 				sim.advance(TIMESTEP);
-								
-				gc.setFill(DISC_COLOR);
+				
 				for (DiscBody db : sim)
-					gc.fillOval(db.getPosX(), db.getPosY(), 2*db.getRadius(), 2*db.getRadius());
+					render(db, gc, Color.PURPLE, TIMESTEP);
+				for (BodyPair bp : sim.getAabbOverlaps()) {
+					render(bp.getBodyA(), gc, Color.WHITE, TIMESTEP);
+					render(bp.getBodyB(), gc, Color.WHITE, TIMESTEP);
+				}
 			
 				long oldFrameTime = frameTimes[frameTimeIndex];
 				frameTimes[frameTimeIndex] = currNanoTime;
@@ -91,6 +94,17 @@ public class Test extends Application {
 		
 		stage.show();
 
+	}
+	
+	private void render(DiscBody db, GraphicsContext gc, Color color, double timestep) {
+		gc.setFill(color);
+//        gc.fillPolygon(
+//        		new double[]{db.getBound(timestep, 1, 0, false), db.getBound(timestep, 1, 0, true), db.getBound(timestep, 1, 0, true), db.getBound(timestep, 1, 0, false)},
+//                new double[]{db.getBound(timestep, 0, 1, false), db.getBound(timestep, 0, 1, false), db.getBound(timestep, 0, 1, true), db.getBound(timestep, 0, 1, true)},
+//                4
+//                );
+//		gc.setFill(Color.BLACK);
+		gc.fillOval(db.getPosX()-db.getRadius(), db.getPosY()-db.getRadius(), 2*db.getRadius(), 2*db.getRadius());
 	}
 	
 	public static void println(Object... args) {

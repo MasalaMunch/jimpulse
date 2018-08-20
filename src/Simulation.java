@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -8,36 +10,45 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 public class Simulation implements Iterable<DiscBody> {
 	
-	private List<DiscBody> bodies;
+	private Set<DiscBody> bodies;
 	private double sapAxisX, sapAxisY;
 	private SAP sapPara, sapPerp;
 	private Set<BodyPair> aabbOverlaps;
 	
 	public Simulation(DiscBody... bodies) {
 		
-		this.bodies = new ArrayList<DiscBody>();
+		this.bodies = new HashSet<DiscBody>(Arrays.asList(bodies));
 		
-		//TODO automatically choose optimal axes
-		sapAxisX = 1280-280;
-		sapAxisY = 720+280;
-		double axisSize = Math.sqrt(sapAxisX*sapAxisX + sapAxisY*sapAxisY);
+		//TODO automatically choose optimal axes depending on resolution
+		sapAxisX = 1280;
+		sapAxisY = 720;
+		final double axisSize = Math.sqrt(sapAxisX*sapAxisX + sapAxisY*sapAxisY);
 		sapAxisX /= axisSize;
 		sapAxisY /= axisSize;
+		
 		sapPara = new SAP(sapAxisX, sapAxisY, bodies);
 		sapPerp = new SAP(sapAxisY, -1*sapAxisX, bodies);
 		
-		aabbOverlaps = new UnifiedSet<BodyPair>();
+		aabbOverlaps = new HashSet<BodyPair>();
+		for (BodyPair overlap : sapPara.getOverlaps()) {
+			if (sapPerp.getOverlaps().contains(overlap))
+				aabbOverlaps.add(overlap);
+		}
 
 	}
 	
+	public Set<BodyPair> getAabbOverlaps() {
+		return aabbOverlaps;
+	}
+
 	public int size() {
 		return bodies.size();
 	}
 		
 	public void advance(double timestep) {
-		
+				
 		//TODO re-enable parallel() when you're done debugging
-		IntStream.range(0, 2).forEach(axis -> {
+		IntStream.range(0, 2).parallel().forEach(axis -> {
 			if (axis == 0)
 				sapPara.updateOverlaps(timestep);
 			else
@@ -58,7 +69,7 @@ public class Simulation implements Iterable<DiscBody> {
 				aabbOverlaps.add(overlap);
 		}
 				
-		Test.println(bodies.size(), "bodies", aabbOverlaps.size(), "overlaps");
+//		Test.println(aabbOverlaps.size(), "overlaps");
 
 		//TODO design constraint solver
 		
