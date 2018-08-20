@@ -17,7 +17,6 @@ public class SAP {
 	private DoubleArrayList bounds;
 	private BooleanArrayList boundTypes; // false is min, true is max
 	private List<DiscBody> boundBodies;
-	private int boundCount;
 	public SAP(double axisX, double axisY, DiscBody... bodies) {
 		
 		this.axisX = axisX;
@@ -32,7 +31,7 @@ public class SAP {
 			boundBodies.add(bodies[i]);
 			boundBodies.add(bodies[i]);
 		}
-		boundCount = bounds.size();
+		final int boundCount = bounds.size();
 		updateBounds(0);
 		
 		Integer[] indices = IntStream.range(0, boundCount).boxed().toArray(Integer[]::new);
@@ -84,7 +83,8 @@ public class SAP {
 		removedOverlaps.clear();
 		
 		updateBounds(timestep);
-				
+		
+		final int boundCount = bounds.size();
 		for (int i=1; i<boundCount; i++) {
 			int rightIndex = i;
 			for (int leftIndex = i-1; leftIndex >= 0; leftIndex--) {
@@ -112,6 +112,7 @@ public class SAP {
 	}
 	
 	private void updateBounds(double timestep) {
+		final int boundCount = bounds.size();
 		for (int i=0; i<boundCount; i++)
 			bounds.set(i, boundBodies.get(i).getBound(
 					timestep, axisX, axisY, boundTypes.get(i))
