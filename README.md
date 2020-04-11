@@ -1,1 +1,1 @@
-A 2D, parallelized implementation of [sweep-and-prune](https://en.wikipedia.org/wiki/Sweep_and_prune). Objects' bounding boxes are expanded based on their velocity, allowing for continuous collision detection that avoids the "bullet though paper" problem. I plan on eventually using this in a game.
+A parallelized implementation of [sweep-and-prune](https://en.wikipedia.org/wiki/Sweep_and_prune). Objects' bounding boxes are expanded based on their velocity, so it can be used to for continuous collision detection that avoids the "bullet through paper" problem.
